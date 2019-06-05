@@ -9,17 +9,60 @@
     <title>esri api tutorial</title>
 </head>
 <body>
-<script>
-    let map1;
-    let mapview;
-    require(['esri/Map','esri/views/MapView'],
-     function(Map,MapView){
-         map1= new Map({basemap:'topo'});
-         mapview = new MapView({container:"mapView", map: map1, zoom:15,
-        center:[43.96727678803782,26.33388770532939]});
-    })
-</script>
 
-    <div id="mapView" style="width:700px;height:700px">Map Goes here</div>
+<button id="satellite">Satallite Map</button>
+<button id="topo">topo Map</button>
+<button id="streets">streets Map</button>
+
+<div id="mapView" style="width:700px;height:700px">Map Goes here</div>
+
+<script>
+    let topoMap;
+    let satMap;
+    let streetsMap;
+    let mapview;
+    let sceneView;
+
+    require(['esri/Map','esri/views/MapView','esri/views/SceneView'],
+     function(Map,MapView,SceneView){
+
+        topoMap= new Map({basemap:'topo'});
+        satMap= new Map({basemap:'satellite'});
+         streetsMap= new Map({basemap:'streets'});
+
+         var viewOptions={container:"mapView", map: satMap, zoom:15,
+        center:[43.96727678803782,26.33388770532939]};
+
+        //  mapview = new MapView({container:"mapView", map: map1, zoom:15,
+        // center:[43.96727678803782,26.33388770532939]});
+
+        sceneView= new SceneView(viewOptions);
+    })
+
+    document.getElementById("topo").addEventListener("click",
+    function()
+    {
+       sceneView.map=topoMap;
+    })
+
+    document.getElementById("streets").addEventListener("click",
+    function()
+    {
+        sceneView.map=streetsMap;
+    })
+
+    document.getElementById("satellite").addEventListener("click",
+    function()
+    {
+        sceneView.map=satMap;
+    })
+
+</script>
 </body>
 </html>
+
+
+
+
+
+<!-- Unable to find basemap definition for: test. Try one of these: "streets", "satellite", "hybrid", "terrain", "topo", "gray", "dark-gray", "oceans", "national-geographic", "osm", "dark-gray-vector", "gray-vector", "streets-vector", "topo-vector", "streets-night-vector", "streets-relief-vector", "streets-navigation-vector" -->
