@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,80 +9,75 @@
     <link rel="styleSheet" href="https://js.arcgis.com/4.4/esri/css/main.css">
     <title>esri api tutorial</title>
 </head>
+
 <body>
+    <select id="lstServices"></select>
 
-<button id="satellite">Satallite Map</button>
-<button id="topo">topo Map</button>
-<button id="streets">streets Map</button>
-<select id="lstServices"></select>
+    <div id="mapView" style="width:1000px;height:800px">Map Goes here</div>
 
-<div id="mapView" style="width:700px;height:700px">Map Goes here</div>
+    <script>
+        let mapview;
+        let map;
+        let layer;
 
-<script>
-    let topoMap;
-    let satMap;
-    let streetsMap;
-    let mapview;
-    let sceneView;
+        require(['esri/Map', 'esri/views/MapView'
+            , 'esri/request', 'esri/layers/MapImageLayer'],
+            function (Map, MapView, Request, MapLayer) {
 
-    require(['esri/Map','esri/views/MapView'
-    ,'esri/views/SceneView','esri/request'],
-     function(Map,MapView,SceneView,Request){
+                map = new Map({ basemap: 'streets' });
 
-        topoMap= new Map({basemap:'topo'});
-        satMap= new Map({basemap:'satellite'});
-         streetsMap= new Map({basemap:'streets'});
+                var viewOptions = {
+                    container: "mapView", map: map, zoom: 12,
+                    center: [43.96727678803782, 26.33388770532939]
+                };
 
-         var viewOptions={container:"mapView", map: satMap, zoom:15,
-        center:[43.96727678803782,26.33388770532939],scale:10000};   
+                mapview = new MapView(viewOptions);
 
-        //  mapview = new MapView({container:"mapView", map: map1, zoom:15,
-        // center:[43.96727678803782,26.33388770532939]});
 
-        sceneView= new SceneView(viewOptions);
-        
 
-        let Url='https://server.arcgisonline.com/arcgis/rest/?f=pjson';
-        let options={responseType:"json"};
-        Request(Url,options)
-        .then(function(response){
-            let result= response.data;
-            let lstServices=document.getElementById("lstServices");
+                let Url = 'http://localhost:6080/arcgis/rest/services?f=pjson';
 
-            for(var i=0; i< result.services.length; i++)
-            {
-                let option= document.createElement("option");
-                option.textContent= result.services[i].name;
-                lstServices.appendChild(option);
-                // alert(result.services[i].name)
-            }
-        });
-    })
 
-    document.getElementById("topo").addEventListener("click",
-    function()
-    {
-       sceneView.map=topoMap;
-    })
+                let options = { responseType: "json" };
+                Request(Url, options)
+                    .then(function (response) {
+                        let result = response.data;
+                        let lstServices = document.getElementById("lstServices");
 
-    document.getElementById("streets").addEventListener("click",
-    function()
-    {
-        sceneView.map=streetsMap;
-    })
+                        lstServices.addEventListener("change", function () {
+                            let selectService = lstServices
+                                .options[lstServices.selectedIndex].textContent;
 
-    document.getElementById("satellite").addEventListener("click",
-    function()
-    {
-        sceneView.map=satMap;
-    })
+                            //add a layer
+                            layer = new MapLayer({ url: "http://localhost:6080/arcgis/rest/services/" + selectService + "/MapServer" });
+                            map.removeAll();
+                            map.add(layer);
+                            layer.then(function () {
+                                mapview.goTo(layer.fullExtent);
+                            })
 
-</script>
+                        })
+
+                        for (var i = 0; i < result.services.length; i++) {
+                            let option = document.createElement("option");
+                            option.textContent = result.services[i].name;
+                            lstServices.appendChild(option);
+                            // alert(result.services[i].name)
+                        }
+                    });
+            })
+    </script>
 </body>
+
 </html>
 
 
-
-
+<!-- 
+    if you need to check how many layer in ever layer
+layer.sublayers.length
+2
+layer.sublayers._items[0].sublayers.lenght
+1
+-->
 
 <!-- Unable to find basemap definition for: test. Try one of these: "streets", "satellite", "hybrid", "terrain", "topo", "gray", "dark-gray", "oceans", "national-geographic", "osm", "dark-gray-vector", "gray-vector", "streets-vector", "topo-vector", "streets-night-vector", "streets-relief-vector", "streets-navigation-vector" -->
