@@ -13,6 +13,7 @@
 <button id="satellite">Satallite Map</button>
 <button id="topo">topo Map</button>
 <button id="streets">streets Map</button>
+<select id="lstServices"></select>
 
 <div id="mapView" style="width:700px;height:700px">Map Goes here</div>
 
@@ -23,20 +24,38 @@
     let mapview;
     let sceneView;
 
-    require(['esri/Map','esri/views/MapView','esri/views/SceneView'],
-     function(Map,MapView,SceneView){
+    require(['esri/Map','esri/views/MapView'
+    ,'esri/views/SceneView','esri/request'],
+     function(Map,MapView,SceneView,Request){
 
         topoMap= new Map({basemap:'topo'});
         satMap= new Map({basemap:'satellite'});
          streetsMap= new Map({basemap:'streets'});
 
          var viewOptions={container:"mapView", map: satMap, zoom:15,
-        center:[43.96727678803782,26.33388770532939]};
+        center:[43.96727678803782,26.33388770532939],scale:10000};   
 
         //  mapview = new MapView({container:"mapView", map: map1, zoom:15,
         // center:[43.96727678803782,26.33388770532939]});
 
         sceneView= new SceneView(viewOptions);
+        
+
+        let Url='https://server.arcgisonline.com/arcgis/rest/?f=pjson';
+        let options={responseType:"json"};
+        Request(Url,options)
+        .then(function(response){
+            let result= response.data;
+            let lstServices=document.getElementById("lstServices");
+
+            for(var i=0; i< result.services.length; i++)
+            {
+                let option= document.createElement("option");
+                option.textContent= result.services[i].name;
+                lstServices.appendChild(option);
+                // alert(result.services[i].name)
+            }
+        });
     })
 
     document.getElementById("topo").addEventListener("click",
