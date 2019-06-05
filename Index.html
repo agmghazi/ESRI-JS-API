@@ -21,8 +21,9 @@
         let layer;
 
         require(['esri/Map', 'esri/views/MapView'
-            , 'esri/request', 'esri/layers/MapImageLayer'],
-            function (Map, MapView, Request, MapLayer) {
+            , 'esri/request', 'esri/layers/MapImageLayer',
+            'esri/widgets/Legend'],
+            function (Map, MapView, Request, MapLayer,Legend) {
 
                 map = new Map({ basemap: 'streets' });
 
@@ -32,7 +33,9 @@
                 };
 
                 mapview = new MapView(viewOptions);
-
+                
+                let legend= new Legend({view:mapview});
+                mapview.ui.add(legend,"bottom-left");
 
 
                 let Url = 'http://localhost:6080/arcgis/rest/services?f=pjson';
@@ -49,7 +52,7 @@
                                 .options[lstServices.selectedIndex].textContent;
 
                             //add a layer
-                            layer = new MapLayer({ url: "http://localhost:6080/arcgis/rest/services/" + selectService + "/MapServer" });
+                             layer = new MapLayer({ url: "http://localhost:6080/arcgis/rest/services/" + selectService + "/MapServer" });
                             map.removeAll();
                             map.add(layer);
                             layer.then(function () {
