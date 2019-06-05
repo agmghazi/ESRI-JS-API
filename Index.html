@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://js.arcgis.com/4.4"></script>
+    <link rel="styleSheet" href="https://js.arcgis.com/4.4/esri/css/main.css">
+    <title>esri api tutorial</title>
+</head>
+<body>
+<script>
+    let map1;
+    let mapview;
+    require(['esri/Map','esri/views/MapView'],
+     function(Map,MapView){
+         map1= new Map({basemap:'topo'});
+         mapview = new MapView({container:"mapView", map: map1, zoom:15,
+        center:[43.96727678803782,26.33388770532939]});
+    })
+</script>
+
+    <div id="mapView" style="width:700px;height:700px">Map Goes here</div>
+</body>
+</html>
