@@ -13,6 +13,7 @@
 <body>
     <select id="lstServices"></select>
     <div id="mapView" style="width:1000px;height:800px">Map Goes here</div>
+    <div id="toc"></div>
     <div id="buttons"></div>
 
     <script>
@@ -27,9 +28,9 @@
         basemaps.push("terrain");
         basemaps.push("osm");
         basemaps.push("national-geographic");
-
+          
+          //generate multi basemap on the fly
         let setBaseMap = e => map.basemap = e.target.id;
-
         for (let i = 0; i < basemaps.length; i++) {
             let buttons = document.getElementById("buttons");
             let button = document.createElement("button");
@@ -52,14 +53,14 @@
                 };
 
                 mapview = new MapView(viewOptions);
-
+                  
+                  // this only to add legend
                 let legend = new Legend({ view: mapview });
                 mapview.ui.add(legend, "bottom-left");
 
-
-                let Url = 'http://localhost:6080/arcgis/rest/services?f=pjson';
-
-
+                    
+                    //this to get all services in arcserver API
+                let Url = 'https://sampleserver6.arcgisonline.com/arcgis/rest/services?f=pjson';
                 let options = { responseType: "json" };
                 Request(Url, options)
                     .then(function (response) {
@@ -71,15 +72,42 @@
                                 .options[lstServices.selectedIndex].textContent;
 
                             //add a layer
-                            layer = new MapLayer({ url: "http://localhost:6080/arcgis/rest/services/" + selectService + "/MapServer" });
+                            layer = new MapLayer({ url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/" + selectService + "/MapServer" });
                             map.removeAll();
                             map.add(layer);
-                            layer.then(function () {
-                                mapview.goTo(layer.fullExtent);
+                            layer.then(() => {
+
+                                //this code to generate table of content (visible & not visible)
+                                let toc = document.getElementById("toc");
+                                toc.innerHTML = "";
+
+                                for (let i = 0; i < layer.sublayers.length; i++) {
+                                    let sublayer = layer.sublayers.items[i];
+
+                                    let chk = document.createElement("input");
+                                    chk.type = "checkbox";
+                                    chk.value = sublayer.id;
+
+                                    chk.checked = sublayer.visible;
+
+                                    chk.addEventListener("click", function (e) {
+                                      let clickedlayer =  layer.findSublayerById(Number(e.target.value));
+                                      clickedlayer.visible = e.target.checked
+                                    })
+
+
+                                    let lbl = document.createElement("label");
+                                    lbl.textContent = sublayer.title;
+                                    toc.appendChild(chk);
+                                    toc.appendChild(lbl);
+
+                                }
+                                mapview.goTo(layer.fullExtent)
+
                             })
 
                         })
-
+                        // this to add all services from url to selectbox
                         for (var i = 0; i < result.services.length; i++) {
                             let option = document.createElement("option");
                             option.textContent = result.services[i].name;
@@ -95,11 +123,21 @@
 
 
 <!-- 
-    if you need to check how many layer in ever layer
+    if you need to check how many layer in ever layer and another important sample code
 layer.sublayers.length
 2
-layer.sublayers._items[0].sublayers.lenght
+layer.sublayers.items[0].sublayers.lenght
 1
+map.layers.items[0].sublayers._items[0].title
+"Damage to Residential Buildings"
+map.layers.items[0].sublayers.length
+1
+map.layers.items[0].findSublayerById(0).title
+"No Permit"
+map.layers.items[0].findSublayerById(0).visible=false
+false
+map.layers.items[0].findSublayerById(0).visible=true
+true
 -->
 
 <!-- Unable to find basemap definition for: test. Try one of these: "streets", "satellite", "hybrid", "terrain", "topo", "gray", "dark-gray", "oceans", "national-geographic", "osm", "dark-gray-vector", "gray-vector", "streets-vector", "topo-vector", "streets-night-vector", "streets-relief-vector", "streets-navigation-vector" -->
