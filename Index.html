@@ -12,38 +12,35 @@
 
 <body>
     <select id="lstServices"></select>
-    <div id="mapView" style="width:1000px;height:800px">Map Goes here</div>
-    <div id="toc"></div>
+    <table>
+        <tr>
+            <td valign=top>
+                <div id="toc">
+                   
+                </div>
+            </td>
+
+            <td>
+                <div id="mapView" style="width:1000px;height:800px">Map Goes here</div>
+            </td>
+        </tr>
+    </table>
+
+
     <div id="buttons"></div>
 
     <script>
         let mapview;
         let map;
         let layer;
-        let basemaps = [];
-        basemaps.push("satellite");
-        basemaps.push("hybrid");
-        basemaps.push("topo");
-        basemaps.push("oceans");
-        basemaps.push("terrain");
-        basemaps.push("osm");
-        basemaps.push("national-geographic");
-          
-          //generate multi basemap on the fly
-        let setBaseMap = e => map.basemap = e.target.id;
-        for (let i = 0; i < basemaps.length; i++) {
-            let buttons = document.getElementById("buttons");
-            let button = document.createElement("button");
-            button.id = basemaps[i];
-            button.textContent = basemaps[i];
-            button.addEventListener("click", setBaseMap)
-            buttons.appendChild(button);
 
-        }
-        require(['esri/Map', 'esri/views/MapView'
-            , 'esri/request', 'esri/layers/MapImageLayer',
+
+        require(['esri/Map', 'esri/views/MapView' ,
+                'esri/request', 'esri/layers/MapImageLayer',
             'esri/widgets/Legend'],
             function (Map, MapView, Request, MapLayer, Legend) {
+
+                generateBaseMaps();
 
                 map = new Map({ basemap: 'streets' });
 
@@ -53,69 +50,123 @@
                 };
 
                 mapview = new MapView(viewOptions);
-                  
-                  // this only to add legend
+
+                // this only to add legend
                 let legend = new Legend({ view: mapview });
                 mapview.ui.add(legend, "bottom-left");
 
-                    
-                    //this to get all services in arcserver API
+
+                //this to get all services in arcserver API
                 let Url = 'https://sampleserver6.arcgisonline.com/arcgis/rest/services?f=pjson';
                 let options = { responseType: "json" };
-                Request(Url, options)
-                    .then(function (response) {
-                        let result = response.data;
-                        let lstServices = document.getElementById("lstServices");
-
-                        lstServices.addEventListener("change", function () {
-                            let selectService = lstServices
-                                .options[lstServices.selectedIndex].textContent;
-
-                            //add a layer
-                            layer = new MapLayer({ url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/" + selectService + "/MapServer" });
-                            map.removeAll();
-                            map.add(layer);
-                            layer.then(() => {
-
-                                //this code to generate table of content (visible & not visible)
-                                let toc = document.getElementById("toc");
-                                toc.innerHTML = "";
-
-                                for (let i = 0; i < layer.sublayers.length; i++) {
-                                    let sublayer = layer.sublayers.items[i];
-
-                                    let chk = document.createElement("input");
-                                    chk.type = "checkbox";
-                                    chk.value = sublayer.id;
-
-                                    chk.checked = sublayer.visible;
-
-                                    chk.addEventListener("click", function (e) {
-                                      let clickedlayer =  layer.findSublayerById(Number(e.target.value));
-                                      clickedlayer.visible = e.target.checked
-                                    })
+                Request(Url, options).then(populateMapServices);
 
 
-                                    let lbl = document.createElement("label");
-                                    lbl.textContent = sublayer.title;
-                                    toc.appendChild(chk);
-                                    toc.appendChild(lbl);
+                //populate the drop downlist of map services
+                function populateMapServices(response) {
+                    let result = response.data;
+                    let lstServices = document.getElementById("lstServices");
 
-                                }
-                                mapview.goTo(layer.fullExtent)
+                    //set event listener onChange
+                    lstServices.addEventListener("change", onChangeServiceMap);
+                    // this to add all services from url to selectbox
+                    for (var i = 0; i < result.services.length; i++) {
+                        let option = document.createElement("option");
+                        option.textContent = result.services[i].name;
+                        lstServices.appendChild(option);
+                        // alert(result.services[i].name)
+                    }
+                }
+                //on change service Map
+                function onChangeServiceMap() {
 
-                            })
+                    let selectService = lstServices
+                        .options[lstServices.selectedIndex].textContent;
 
-                        })
-                        // this to add all services from url to selectbox
-                        for (var i = 0; i < result.services.length; i++) {
-                            let option = document.createElement("option");
-                            option.textContent = result.services[i].name;
-                            lstServices.appendChild(option);
-                            // alert(result.services[i].name)
-                        }
-                    });
+                    //add a layer
+                    layer = new MapLayer({ url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/" + selectService + "/MapServer" });
+                    map.removeAll();
+                    map.add(layer);
+                    //wait until the layer is loaded
+                    layer.then(() => {
+
+                        //this code to generate table of content (visible & not visible)
+                        let toc = document.getElementById("toc");
+                        toc.innerHTML = "";
+
+                        let layerList = document.createElement("ul");
+                        toc.appendChild(layerList);
+
+                        //populate layer in list
+                        populateLayer(layer, layerList);
+
+                        mapview.goTo(layer.fullExtent)
+
+                    })
+
+                }
+
             })
+
+
+
+        // populate layer in the input element
+        function populateLayer(thislayer, layerList) {
+            for (let i = 0; i < thislayer.sublayers.length; i++) {
+                let sublayer = thislayer.sublayers.items[i];
+
+                let chk = document.createElement("input");
+                chk.type = "checkbox";
+                chk.value = sublayer.id;
+
+                chk.checked = sublayer.visible;
+
+                chk.addEventListener("click", function (e) {
+                    let clickedlayer = thislayer.findSublayerById(Number(e.target.value));
+                    clickedlayer.visible = e.target.checked
+                })
+
+
+                let lbl = document.createElement("label");
+                lbl.textContent = sublayer.title;
+
+                let layerItem = document.createElement("li");
+                layerItem.appendChild(chk);
+                layerItem.appendChild(lbl);
+                layerList.appendChild(layerItem);
+
+            }
+        }
+
+
+        //generate alots of button of basemaps
+        function generateBaseMaps() {
+            let basemaps = [];
+            //  <!-- Unable to find basemap definition for: test. Try one of these:
+            //   "streets", "satellite", "hybrid", "terrain", "topo", "gray", "dark-gray", "oceans", 
+            //   "national-geographic", "osm", "dark-gray-vector", "gray-vector", "streets-vector", 
+            //   "topo-vector", "streets-night-vector", "streets-relief-vector", "streets-navigation-vector" -->
+            basemaps.push("satellite");
+            basemaps.push("hybrid");
+            basemaps.push("topo");
+            basemaps.push("oceans");
+            basemaps.push("terrain");
+            basemaps.push("osm");
+            basemaps.push("national-geographic");
+            basemaps.push("streets-night-vector");
+
+            //generate multi basemap on the fly
+            let setBaseMap = e => map.basemap = e.target.id;
+            for (let i = 0; i < basemaps.length; i++) {
+                let buttons = document.getElementById("buttons");
+                let button = document.createElement("button");
+                button.id = basemaps[i];
+                button.textContent = basemaps[i];
+                button.addEventListener("click", setBaseMap)
+                buttons.appendChild(button);
+
+            }
+        }
     </script>
 </body>
 
@@ -139,5 +190,3 @@ false
 map.layers.items[0].findSublayerById(0).visible=true
 true
 -->
-
-<!-- Unable to find basemap definition for: test. Try one of these: "streets", "satellite", "hybrid", "terrain", "topo", "gray", "dark-gray", "oceans", "national-geographic", "osm", "dark-gray-vector", "gray-vector", "streets-vector", "topo-vector", "streets-night-vector", "streets-relief-vector", "streets-navigation-vector" -->
