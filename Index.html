@@ -16,7 +16,7 @@
         <tr>
             <td valign=top>
                 <div id="toc">
-                   
+
                 </div>
             </td>
 
@@ -35,8 +35,8 @@
         let layer;
 
 
-        require(['esri/Map', 'esri/views/MapView' ,
-                'esri/request', 'esri/layers/MapImageLayer',
+        require(['esri/Map', 'esri/views/MapView',
+            'esri/request', 'esri/layers/MapImageLayer',
             'esri/widgets/Legend'],
             function (Map, MapView, Request, MapLayer, Legend) {
 
@@ -98,7 +98,7 @@
                         toc.appendChild(layerList);
 
                         //populate layer in list
-                        populateLayer(layer, layerList);
+                        populateLayerRecursive(layer, layerList);
 
                         mapview.goTo(layer.fullExtent)
 
@@ -136,8 +136,41 @@
                 layerList.appendChild(layerItem);
 
             }
+
+
         }
 
+        // populate layer Recursive in the input element
+        function populateLayerRecursive(thislayer, layerList) {
+
+            let chk = document.createElement("input");
+            chk.type = "checkbox";
+            chk.value = thislayer.id;
+            chk.checked = thislayer.visible;
+
+            chk.addEventListener("click", function (e) {
+                thislayer.visible = e.target.checked
+            })
+
+            let lbl = document.createElement("label");
+            lbl.textContent = thislayer.title;
+
+            let layerItem = document.createElement("li");
+            layerItem.appendChild(chk);
+            layerItem.appendChild(lbl);
+            layerList.appendChild(layerItem);
+
+            if ( thislayer.sublayers != null && thislayer.sublayers.items.length > 0) {
+            
+            let newList = document.createElement("ul");
+            layerList.appendChild(newList);
+
+            for (let i = 0; i < thislayer.sublayers.length; i++) {
+
+                populateLayerRecursive(thislayer.sublayers.items[i],newList)
+            }
+            }
+        }
 
         //generate alots of button of basemaps
         function generateBaseMaps() {
@@ -174,6 +207,8 @@
 
 
 <!-- 
+<< Code in Console window in  google chrome >>
+
     if you need to check how many layer in ever layer and another important sample code
 layer.sublayers.length
 2
@@ -189,4 +224,14 @@ map.layers.items[0].findSublayerById(0).visible=false
 false
 map.layers.items[0].findSublayerById(0).visible=true
 true
+
+
+layer.sublayers.items.length
+1
+layer.sublayers.items[0].sublayers._items.length
+3
+layer.sublayers.items[0].sublayers._items[0].sublayers._items.length
+2
+layer.sublayers.items[0].sublayers._items[0].id
+7
 -->
