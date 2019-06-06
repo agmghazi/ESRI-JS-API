@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://js.arcgis.com/4.4"></script>
+    <link rel="styleSheet" href="https://js.arcgis.com/4.4/esri/css/main.css">
+    <title>esri api tutorial</title>
+</head>
+
+<body>
+    <button id="satalitte">Satalitte Map</button>
+    <button id="topo">Topo Map</button>
+    <button id="street">Street Map</button>
+
+    <div id="mapView" style="width:1000px;height:800px">Map Goes here</div>
+
+    <script>
+        let sceneView;
+        let topoMap;
+        let satMap;
+        let streetMap;
+        let lastLan;
+        let lastLong;
+        let lastZoom;
+
+        require(['esri/Map', 'esri/views/SceneView'],
+            function (Map, SceneView) {
+
+                topoMap = new Map({ basemap: 'topo' });
+                satMap = new Map({ basemap: 'satellite' });
+                streetMap= new Map({basemap:'streets'});  
+
+                var viewOptions = {
+                    container: "mapView", map: topoMap, zoom: 12,
+                    center: [43.96727678803782, 26.33388770532939]
+                };
+
+                sceneView = new SceneView(viewOptions);
+            });
+
+            document.getElementById("satalitte").addEventListener("click",function(){
+                lastLan=sceneView.center.latitude;
+                lastLong= sceneView.center.longitude;
+                lastZoom= sceneView.zoom;
+                let p = new Promise(function(resolve, reject){
+                    sceneView.map=satMap;
+                    resolve();
+                })
+                p.then(function(){
+                sceneView.center=[lastLong,lastLan];
+                sceneView.zoom=lastZoom;
+                })
+            })
+
+            document.getElementById("topo").addEventListener("click",function(){
+                lastLan=sceneView.center.latitude;
+                lastLong= sceneView.center.longitude;
+                lastZoom= sceneView.zoom;
+                let p = new Promise(function(resolve, reject){
+                    sceneView.map=topoMap;
+                    resolve();
+                })
+                p.then(function(){
+                    sceneView.center=[lastLong,lastLan];
+                    sceneView.zoom=lastZoom;
+                })
+            })
+
+            document.getElementById("street").addEventListener("click",function(){
+                lastLan=sceneView.center.latitude;
+                lastLong= sceneView.center.longitude;
+                lastZoom= sceneView.zoom;
+                let p = new Promise(function(resolve, reject){
+                    sceneView.map=streetMap;
+                    resolve();
+                })
+                p.then(function(){
+                    sceneView.center=[lastLong,lastLan];
+                    sceneView.zoom=lastZoom;
+                })
+            })
+    </script>
+</body>
+
+</html>
+
+
+<!-- Unable to find basemap definition for: test. Try one of these: "streets", "satellite", "hybrid", "terrain", "topo", "gray", "dark-gray", "oceans", "national-geographic", "osm", "dark-gray-vector", "gray-vector", "streets-vector", "topo-vector", "streets-night-vector", "streets-relief-vector", "streets-navigation-vector" -->
