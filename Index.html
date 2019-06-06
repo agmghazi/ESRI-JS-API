@@ -111,7 +111,7 @@
             })
 
             //this for query data
-        function getCount(layerId) {
+        function getCount(layerId, el) {
             let queryUrl = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/" +selectdService  + "/MapServer/" + layerId + "/query";
             let queryOption = {
                 responseType: "json",
@@ -122,7 +122,8 @@
                 }
             }
 
-            Request(queryUrl, queryOption).then(response =>alert(response.data.count));
+            Request(queryUrl, queryOption).then(response =>el.textContent = response.data.count,
+                  response=> el.style.visibility="hidden");
         }
 
         // populate layer Recursive in the input element
@@ -140,8 +141,9 @@
 
             let btn = document.createElement("button");
             btn.textContent = "Count";
-
-            btn.addEventListener("click", e=> getCount(thislayer.id))
+             
+            getCount(thislayer.id , btn );
+           // btn.addEventListener("click", e=> getCount(thislayer.id,btn))
 
             let layerItem = document.createElement("li");
             layerItem.appendChild(chk);
