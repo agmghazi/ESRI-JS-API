@@ -33,12 +33,14 @@
         let mapview;
         let map;
         let layer;
-
+        let Request;
+        let selectdService;
 
         require(['esri/Map', 'esri/views/MapView',
             'esri/request', 'esri/layers/MapImageLayer',
             'esri/widgets/Legend'],
-            function (Map, MapView, Request, MapLayer, Legend) {
+            function (Map, MapView, EsriRequest, MapLayer, Legend) {
+               Request=EsriRequest;
 
                 generateBaseMaps();
 
@@ -60,7 +62,7 @@
                 let Url = 'https://sampleserver6.arcgisonline.com/arcgis/rest/services?f=pjson';
                 let options = { responseType: "json" };
                 Request(Url, options).then(populateMapServices);
-
+                getCount(3);
 
                 //populate the drop downlist of map services
                 function populateMapServices(response) {
@@ -80,11 +82,11 @@
                 //on change service Map
                 function onChangeServiceMap() {
 
-                    let selectService = lstServices
+                     selectdService = lstServices
                         .options[lstServices.selectedIndex].textContent;
 
                     //add a layer
-                    layer = new MapLayer({ url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/" + selectService + "/MapServer" });
+                    layer = new MapLayer({ url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/" + selectdService + "/MapServer" });
                     map.removeAll();
                     map.add(layer);
                     //wait until the layer is loaded
@@ -108,36 +110,19 @@
 
             })
 
-
-
-        // populate layer in the input element
-        function populateLayer(thislayer, layerList) {
-            for (let i = 0; i < thislayer.sublayers.length; i++) {
-                let sublayer = thislayer.sublayers.items[i];
-
-                let chk = document.createElement("input");
-                chk.type = "checkbox";
-                chk.value = sublayer.id;
-
-                chk.checked = sublayer.visible;
-
-                chk.addEventListener("click", function (e) {
-                    let clickedlayer = thislayer.findSublayerById(Number(e.target.value));
-                    clickedlayer.visible = e.target.checked
-                })
-
-
-                let lbl = document.createElement("label");
-                lbl.textContent = sublayer.title;
-
-                let layerItem = document.createElement("li");
-                layerItem.appendChild(chk);
-                layerItem.appendChild(lbl);
-                layerList.appendChild(layerItem);
-
+            //this for query data
+        function getCount(layerId) {
+            let queryUrl = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/" +selectdService  + "/MapServer/" + layerId + "/query";
+            let queryOption = {
+                responseType: "json",
+                query: {
+                    f: "json",
+                    where: "1=1",
+                    returnCountOnly: true
+                }
             }
 
-
+            Request(queryUrl, queryOption).then(response =>alert(response.data.count));
         }
 
         // populate layer Recursive in the input element
@@ -148,27 +133,30 @@
             chk.value = thislayer.id;
             chk.checked = thislayer.visible;
 
-            chk.addEventListener("click", function (e) {
-                thislayer.visible = e.target.checked
-            })
+            chk.addEventListener("click", e=> {thislayer.visible = e.target.checked})
 
             let lbl = document.createElement("label");
             lbl.textContent = thislayer.title;
+
+            let btn = document.createElement("button");
+            btn.textContent = "Count";
+
+            btn.addEventListener("click", e=> getCount(thislayer.id))
 
             let layerItem = document.createElement("li");
             layerItem.appendChild(chk);
             layerItem.appendChild(lbl);
             layerList.appendChild(layerItem);
+            layerItem.appendChild(btn);
+            if (thislayer.sublayers != null && thislayer.sublayers.items.length > 0) {
 
-            if ( thislayer.sublayers != null && thislayer.sublayers.items.length > 0) {
-            
-            let newList = document.createElement("ul");
-            layerList.appendChild(newList);
+                let newList = document.createElement("ul");
+                layerList.appendChild(newList);
 
-            for (let i = 0; i < thislayer.sublayers.length; i++) {
+                for (let i = 0; i < thislayer.sublayers.length; i++) {
 
-                populateLayerRecursive(thislayer.sublayers.items[i],newList)
-            }
+                    populateLayerRecursive(thislayer.sublayers.items[i], newList)
+                }
             }
         }
 
