@@ -25,9 +25,13 @@
                 <div id="mapView" style="width:1000px;height:500px">Map Goes here</div>
             </td>
         </tr>
-
         <tr>
-            <td colspan="2"> <span style="color:red; font-size:20px">Atribute Table</span>
+            <td colspan="2"> <span style="color:red; font-size:20px">Pages: </span>
+                <div id="Pages"> </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"> <span style="color:red; font-size:20px">Atribute Table: </span>
                 <div id="attributeTable"> </div>
             </td>
         </tr>
@@ -43,7 +47,7 @@
         let selectdService;
         const DefaultBaseMap = "streets";
         const DefaultService = "Water_Network";
-        const DefaultPageSize = "5"; 
+        const DefaultPageSize = "100";
 
         require(['esri/Map',
             'esri/views/MapView',
@@ -234,11 +238,27 @@
                 cmbBasemaps.appendChild(option);
             }
         }
+
+        //to paging all recordes
+        function populatePages(featureCount) {
+            let pageCount = Math.ceil(featureCount / DefaultPageSize);
+            let pagesDiv = document.getElementById("Pages");
+            pagesDiv.innerHTML= "";
+            
+            for (let i = 0; i < pageCount; i++) {
+                let page = document.createElement("button");
+                page.textContent = i +1;
+                pagesDiv.appendChild(page);
+            }
+            // alert("page count : " + pageCount);
+        }
+
         function openAttributeTable(e) {
             let layerId = e.target.layerId;
             let featureCount = 0;
             getCount(layerId, c => {
                 featureCount = c;
+                populatePages(featureCount);
                 populateAtributeTable(layerId, featureCount)
             })
         }
@@ -246,7 +266,8 @@
         //populate the attribute of a given layer
         function populateAtributeTable(layerId, featureCount) {
             //alert("Calling attribute table "+ e.target.layerId);
-            alert(featureCount);
+
+            //  alert(featureCount);
 
             let attributeTable = document.getElementById("attributeTable");
             attributeTable.innerHTML = "";
