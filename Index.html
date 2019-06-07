@@ -96,7 +96,7 @@
                     for (var i = 0; i < result.services.length; i++) {
                         let option = document.createElement("option");
                         option.textContent = result.services[i].name;
-                        if(DefaultService == result.services[i].name) option.selected = true;
+                        if (DefaultService == result.services[i].name) option.selected = true;
                         lstServices.appendChild(option);
                         // alert(result.services[i].name)
                     }
@@ -268,8 +268,20 @@
                     for (let i = 0; i < response.data.fields.length; i++) {
 
                         let field = response.data.fields[i];
+
                         let column = document.createElement("td");
-                        column.textContent = feature.attributes[field.name];
+                         
+                         // this to convert datetime from EPOCH(this to use samply to use by any thing in programming
+                        //  (samply to convert to mile second)) to Date
+                        if (field.type == "esriFieldTypeDate") {
+
+                           let date = new Date(feature.attributes[field.name]);
+                           column.textContent = date.toLocaleDateString('en-US');;
+                        }
+                        else {
+                            column.textContent = feature.attributes[field.name];
+
+                        }
                         row.appendChild(column);
                     }
                 }
