@@ -11,9 +11,9 @@
 </head>
 
 <body>
-    Services: <select id="lstServices"></select>
-    Basemap: <select id="buttons"></select>
-    <table>
+    <span style="color:red; font-size:20px"> Services:</span> <select id="lstServices"></select>
+    <span style="color:red; font-size:20px"> Basemap:</span> <select id="buttons"></select>
+    <table border="1">
         <tr>
             <td valign=top>
                 <div id="toc">
@@ -22,7 +22,13 @@
             </td>
 
             <td>
-                <div id="mapView" style="width:1000px;height:800px">Map Goes here</div>
+                <div id="mapView" style="width:1000px;height:500px">Map Goes here</div>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2"> <span style="color:red; font-size:20px">Atribute Table</span>
+                <div id="attributeTable"> </div>
             </td>
         </tr>
     </table>
@@ -58,7 +64,7 @@
 
                 var viewOptions = {
                     container: "mapView", map: map, zoom: 15,
-                    center: [-88.15305218650816,41.77040974261415]
+                    center: [-88.15305218650816, 41.77040974261415]
 
                 };
 
@@ -67,9 +73,9 @@
                 // this only to add legend widget
                 let legend = new Legend({ view: mapview });
                 mapview.ui.add(legend, "bottom-left");
-                 
+
                 //this only for add Search widget
-                let search = new Search({view:mapview});
+                let search = new Search({ view: mapview });
                 mapview.ui.add(search, "top-right");
 
                 //this to get all services in arcserver API
@@ -157,7 +163,9 @@
             btn.textContent = "Count";
 
             getCount(thislayer.id, btn);
-            // btn.addEventListener("click", e=> getCount(thislayer.id,btn))
+            //on click, open attribut table
+            btn.layerId = thislayer.id;
+            btn.addEventListener("click", populateAtributeTable);
 
             let layerItem = document.createElement("li");
             layerItem.appendChild(chk);
@@ -213,8 +221,60 @@
                 if (basemaps[i] == DefaultBaseMap) option.selected = true;
 
                 cmbBasemaps.appendChild(option);
-
             }
+        }
+
+        //populate the attribute of a given layer
+        function populateAtributeTable(e) {
+            //alert("Calling attribute table "+ e.target.layerId);
+
+            let attributeTable = document.getElementById("attributeTable");
+            attributeTable.innerHTML = "";
+            let queryUrl = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/" + selectdService + "/MapServer/" + e.target.layerId + "/query";
+            let queryOption = {
+                responseType: "json",
+                query: {
+                    f: "json",
+                    where: "1=1",
+                    returnCountOnly: false,
+                    outFields: "*",
+                    resultRecordCount: "10"
+                }
+            }
+
+            Request(queryUrl, queryOption).then(response => {
+
+                //alert(response.data.fields.length);
+                let table = document.createElement("table");
+                table.border = 2;
+                let header = document.createElement("tr");
+                table.appendChild(header);
+                //populate the fileds / columns
+                for (let i = 0; i < response.data.fields.length; i++) {
+
+                    let column = document.createElement("th");
+                    column.textContent = response.data.fields[i].alias;
+                    header.appendChild(column);
+                }
+
+                //loop through all features
+                for (let j = 0; j < response.data.features.length; j++) {
+                    let feature = response.data.features[j];
+                    let row = document.createElement("tr");
+                    table.appendChild(row);
+                    for (let i = 0; i < response.data.fields.length; i++) {
+
+                        let field = response.data.fields[i];
+                        let column = document.createElement("td");
+                        column.textContent = feature.attributes[field.name];
+                        row.appendChild(column);
+                    }
+                }
+
+
+                attributeTable.appendChild(table);
+
+            }, response => el.style.visibility = "hidden");
         }
     </script>
 </body>
