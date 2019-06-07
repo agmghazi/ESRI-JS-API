@@ -11,7 +11,8 @@
 </head>
 
 <body>
-    <select id="lstServices"></select>
+   Services: <select id="lstServices"></select>  
+    Basemap: <select id="buttons"></select>
     <table>
         <tr>
             <td valign=top>
@@ -27,7 +28,6 @@
     </table>
 
 
-    <div id="buttons"></div>
 
     <script>
         let mapview;
@@ -35,16 +35,17 @@
         let layer;
         let Request;
         let selectdService;
+        const DefaultBaseMap = "streets";
 
         require(['esri/Map', 'esri/views/MapView',
             'esri/request', 'esri/layers/MapImageLayer',
             'esri/widgets/Legend'],
             function (Map, MapView, EsriRequest, MapLayer, Legend) {
-               Request=EsriRequest;
+                Request = EsriRequest;
 
                 generateBaseMaps();
 
-                map = new Map({ basemap: 'streets' });
+                map = new Map({ basemap: DefaultBaseMap });
 
                 var viewOptions = {
                     container: "mapView", map: map, zoom: 12,
@@ -62,7 +63,7 @@
                 let Url = 'https://sampleserver6.arcgisonline.com/arcgis/rest/services?f=pjson';
                 let options = { responseType: "json" };
                 Request(Url, options).then(populateMapServices);
-                getCount(3);
+              //  getCount(3);
 
                 //populate the drop downlist of map services
                 function populateMapServices(response) {
@@ -82,7 +83,7 @@
                 //on change service Map
                 function onChangeServiceMap() {
 
-                     selectdService = lstServices
+                    selectdService = lstServices
                         .options[lstServices.selectedIndex].textContent;
 
                     //add a layer
@@ -110,9 +111,9 @@
 
             })
 
-            //this for query data
+        //this for query data
         function getCount(layerId, el) {
-            let queryUrl = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/" +selectdService  + "/MapServer/" + layerId + "/query";
+            let queryUrl = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/" + selectdService + "/MapServer/" + layerId + "/query";
             let queryOption = {
                 responseType: "json",
                 query: {
@@ -122,8 +123,8 @@
                 }
             }
 
-            Request(queryUrl, queryOption).then(response =>el.textContent = response.data.count,
-                  response=> el.style.visibility="hidden");
+            Request(queryUrl, queryOption).then(response => el.textContent = response.data.count,
+                response => el.style.visibility = "hidden");
         }
 
         // populate layer Recursive in the input element
@@ -134,16 +135,16 @@
             chk.value = thislayer.id;
             chk.checked = thislayer.visible;
 
-            chk.addEventListener("click", e=> {thislayer.visible = e.target.checked})
+            chk.addEventListener("click", e => { thislayer.visible = e.target.checked })
 
             let lbl = document.createElement("label");
             lbl.textContent = thislayer.title;
 
             let btn = document.createElement("button");
             btn.textContent = "Count";
-             
-            getCount(thislayer.id , btn );
-           // btn.addEventListener("click", e=> getCount(thislayer.id,btn))
+
+            getCount(thislayer.id, btn);
+            // btn.addEventListener("click", e=> getCount(thislayer.id,btn))
 
             let layerItem = document.createElement("li");
             layerItem.appendChild(chk);
@@ -174,19 +175,30 @@
             basemaps.push("topo");
             basemaps.push("oceans");
             basemaps.push("terrain");
+            basemaps.push("streets");
             basemaps.push("osm");
             basemaps.push("national-geographic");
             basemaps.push("streets-night-vector");
 
             //generate multi basemap on the fly
-            let setBaseMap = e => map.basemap = e.target.id;
+            let setBaseMap = e => {
+                let list = e.target;
+             let selectedBasemap = list.options[list.selectedIndex].textContent;
+             map.basemap = selectedBasemap;
+            };
+            let cmbBasemaps = document.getElementById("buttons");
+            cmbBasemaps.addEventListener("change", setBaseMap)
+
             for (let i = 0; i < basemaps.length; i++) {
-                let buttons = document.getElementById("buttons");
-                let button = document.createElement("button");
-                button.id = basemaps[i];
-                button.textContent = basemaps[i];
-                button.addEventListener("click", setBaseMap)
-                buttons.appendChild(button);
+
+
+                let option = document.createElement("option");
+                option.id = basemaps[i];
+                option.textContent = basemaps[i];
+                    
+                if(basemaps[i] == DefaultBaseMap ) option.selected =true;
+
+                cmbBasemaps.appendChild(option);
 
             }
         }
