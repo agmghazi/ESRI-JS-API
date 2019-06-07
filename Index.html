@@ -42,6 +42,7 @@
         let Request;
         let selectdService;
         const DefaultBaseMap = "streets";
+        const DefaultService = "Water_Network";
 
         require(['esri/Map',
             'esri/views/MapView',
@@ -95,9 +96,11 @@
                     for (var i = 0; i < result.services.length; i++) {
                         let option = document.createElement("option");
                         option.textContent = result.services[i].name;
+                        if(DefaultService == result.services[i].name) option.selected = true;
                         lstServices.appendChild(option);
                         // alert(result.services[i].name)
                     }
+                    onChangeServiceMap();
                 }
                 //on change service Map
                 function onChangeServiceMap() {
