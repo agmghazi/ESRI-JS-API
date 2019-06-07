@@ -43,6 +43,7 @@
         let selectdService;
         const DefaultBaseMap = "streets";
         const DefaultService = "Water_Network";
+        const DefaultPageSize = "5"; 
 
         require(['esri/Map',
             'esri/views/MapView',
@@ -79,28 +80,32 @@
                 let search = new Search({ view: mapview });
                 mapview.ui.add(search, "top-right");
 
-                //this to get all services in arcserver API
-                let Url = 'https://sampleserver6.arcgisonline.com/arcgis/rest/services?f=pjson';
-                let options = { responseType: "json" };
-                Request(Url, options).then(populateMapServices);
-                //  getCount(3);
+                //query the sample server and list all map services in a dropdownlist
+                populateMapServices();
+
 
                 //populate the drop downlist of map services
-                function populateMapServices(response) {
-                    let result = response.data;
-                    let lstServices = document.getElementById("lstServices");
+                function populateMapServices() {
 
-                    //set event listener onChange
-                    lstServices.addEventListener("change", onChangeServiceMap);
-                    // this to add all services from url to selectbox
-                    for (var i = 0; i < result.services.length; i++) {
-                        let option = document.createElement("option");
-                        option.textContent = result.services[i].name;
-                        if (DefaultService == result.services[i].name) option.selected = true;
-                        lstServices.appendChild(option);
-                        // alert(result.services[i].name)
-                    }
-                    onChangeServiceMap();
+                    //this to get all services in arcserver API
+                    let Url = 'https://sampleserver6.arcgisonline.com/arcgis/rest/services?f=pjson';
+                    let options = { responseType: "json" };
+                    Request(Url, options).then(response => {
+                        let result = response.data;
+                        let lstServices = document.getElementById("lstServices");
+
+                        //set event listener onChange
+                        lstServices.addEventListener("change", onChangeServiceMap);
+                        // this to add all services from url to selectbox
+                        for (var i = 0; i < result.services.length; i++) {
+                            let option = document.createElement("option");
+                            option.textContent = result.services[i].name;
+                            if (DefaultService == result.services[i].name) option.selected = true;
+                            lstServices.appendChild(option);
+                            // alert(result.services[i].name)
+                        }
+                        onChangeServiceMap();
+                    });
                 }
                 //on change service Map
                 function onChangeServiceMap() {
@@ -113,29 +118,30 @@
                     map.removeAll();
                     map.add(layer);
                     //wait until the layer is loaded
-                    layer.then(() => {
-
-                        //this code to generate table of content (visible & not visible)
-                        let toc = document.getElementById("toc");
-                        toc.innerHTML = "";
-
-                        let layerList = document.createElement("ul");
-                        toc.appendChild(layerList);
-
-                        //populate layer in list
-                        populateLayerRecursive(layer, layerList);
-
-                        mapview.goTo(layer.fullExtent)
-
-                    })
+                    layer.then(buildToc)
 
                 }
 
             })
 
+        function buildToc() {
+            //this code to generate table of content (visible & not visible)
+            let toc = document.getElementById("toc");
+            toc.innerHTML = "";
+
+            let layerList = document.createElement("ul");
+            toc.appendChild(layerList);
+
+            //populate layer in list
+            populateLayerRecursive(layer, layerList);
+
+            mapview.goTo(layer.fullExtent)
+
+        }
         //this for query data
-        function getCount(layerId, el) {
-            let queryUrl = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/" + selectdService + "/MapServer/" + layerId + "/query";
+        function getCount(layerId, featureCount) {
+            let queryUrl = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/"
+                + selectdService + "/MapServer/" + layerId + "/query";
             let queryOption = {
                 responseType: "json",
                 query: {
@@ -145,8 +151,9 @@
                 }
             }
 
-            Request(queryUrl, queryOption).then(response => el.textContent = response.data.count,
-                response => el.style.visibility = "hidden");
+            Request(queryUrl, queryOption).then(
+                response => featureCount(response.data.count),
+                response => featureCount(0));
         }
 
         // populate layer Recursive in the input element
@@ -160,15 +167,16 @@
             chk.addEventListener("click", e => { thislayer.visible = e.target.checked })
 
             let lbl = document.createElement("label");
-            lbl.textContent = thislayer.title;
+            lbl.textContent = thislayer.title + "   ";
 
             let btn = document.createElement("button");
-            btn.textContent = "Count";
+            btn.textContent = "view";
 
-            getCount(thislayer.id, btn);
+            //this method to get count for every layer
+            //getCount(thislayer.id, btn);
             //on click, open attribut table
             btn.layerId = thislayer.id;
-            btn.addEventListener("click", populateAtributeTable);
+            btn.addEventListener("click", openAttributeTable);
 
             let layerItem = document.createElement("li");
             layerItem.appendChild(chk);
@@ -226,14 +234,24 @@
                 cmbBasemaps.appendChild(option);
             }
         }
+        function openAttributeTable(e) {
+            let layerId = e.target.layerId;
+            let featureCount = 0;
+            getCount(layerId, c => {
+                featureCount = c;
+                populateAtributeTable(layerId, featureCount)
+            })
+        }
 
         //populate the attribute of a given layer
-        function populateAtributeTable(e) {
+        function populateAtributeTable(layerId, featureCount) {
             //alert("Calling attribute table "+ e.target.layerId);
+            alert(featureCount);
 
             let attributeTable = document.getElementById("attributeTable");
             attributeTable.innerHTML = "";
-            let queryUrl = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/" + selectdService + "/MapServer/" + e.target.layerId + "/query";
+            let queryUrl = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/"
+                + selectdService + "/MapServer/" + layerId + "/query";
             let queryOption = {
                 responseType: "json",
                 query: {
@@ -241,7 +259,7 @@
                     where: "1=1",
                     returnCountOnly: false,
                     outFields: "*",
-                    resultRecordCount: "10"
+                    resultRecordCount: DefaultPageSize
                 }
             }
 
@@ -270,13 +288,13 @@
                         let field = response.data.fields[i];
 
                         let column = document.createElement("td");
-                         
-                         // this to convert datetime from EPOCH(this to use samply to use by any thing in programming
+
+                        // this to convert datetime from EPOCH(this to use samply to use by any thing in programming
                         //  (samply to convert to mile second)) to Date
                         if (field.type == "esriFieldTypeDate") {
 
-                           let date = new Date(feature.attributes[field.name]);
-                           column.textContent = date.toLocaleDateString('en-US');;
+                            let date = new Date(feature.attributes[field.name]);
+                            column.textContent = date.toLocaleDateString('en-US');;
                         }
                         else {
                             column.textContent = feature.attributes[field.name];
