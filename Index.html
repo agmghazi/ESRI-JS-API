@@ -11,7 +11,7 @@
 </head>
 
 <body>
-   Services: <select id="lstServices"></select>  
+    Services: <select id="lstServices"></select>
     Basemap: <select id="buttons"></select>
     <table>
         <tr>
@@ -37,10 +37,19 @@
         let selectdService;
         const DefaultBaseMap = "streets";
 
-        require(['esri/Map', 'esri/views/MapView',
-            'esri/request', 'esri/layers/MapImageLayer',
-            'esri/widgets/Legend'],
-            function (Map, MapView, EsriRequest, MapLayer, Legend) {
+        require(['esri/Map',
+            'esri/views/MapView',
+            'esri/request',
+            'esri/layers/MapImageLayer',
+            'esri/widgets/Legend',
+            'esri/widgets/Search'],
+            function (Map,
+                MapView,
+                EsriRequest,
+                MapLayer,
+                Legend,
+                Search) {
+
                 Request = EsriRequest;
 
                 generateBaseMaps();
@@ -48,22 +57,26 @@
                 map = new Map({ basemap: DefaultBaseMap });
 
                 var viewOptions = {
-                    container: "mapView", map: map, zoom: 12,
-                    center: [43.96727678803782, 26.33388770532939]
+                    container: "mapView", map: map, zoom: 15,
+                    center: [-88.15305218650816,41.77040974261415]
+
                 };
 
                 mapview = new MapView(viewOptions);
 
-                // this only to add legend
+                // this only to add legend widget
                 let legend = new Legend({ view: mapview });
                 mapview.ui.add(legend, "bottom-left");
-
+                 
+                //this only for add Search widget
+                let search = new Search({view:mapview});
+                mapview.ui.add(search, "top-right");
 
                 //this to get all services in arcserver API
                 let Url = 'https://sampleserver6.arcgisonline.com/arcgis/rest/services?f=pjson';
                 let options = { responseType: "json" };
                 Request(Url, options).then(populateMapServices);
-              //  getCount(3);
+                //  getCount(3);
 
                 //populate the drop downlist of map services
                 function populateMapServices(response) {
@@ -177,14 +190,15 @@
             basemaps.push("terrain");
             basemaps.push("streets");
             basemaps.push("osm");
+            basemaps.push("topo-vector");
             basemaps.push("national-geographic");
             basemaps.push("streets-night-vector");
 
             //generate multi basemap on the fly
             let setBaseMap = e => {
                 let list = e.target;
-             let selectedBasemap = list.options[list.selectedIndex].textContent;
-             map.basemap = selectedBasemap;
+                let selectedBasemap = list.options[list.selectedIndex].textContent;
+                map.basemap = selectedBasemap;
             };
             let cmbBasemaps = document.getElementById("buttons");
             cmbBasemaps.addEventListener("change", setBaseMap)
@@ -195,8 +209,8 @@
                 let option = document.createElement("option");
                 option.id = basemaps[i];
                 option.textContent = basemaps[i];
-                    
-                if(basemaps[i] == DefaultBaseMap ) option.selected =true;
+
+                if (basemaps[i] == DefaultBaseMap) option.selected = true;
 
                 cmbBasemaps.appendChild(option);
 
