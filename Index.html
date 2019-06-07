@@ -26,13 +26,13 @@
             </td>
         </tr>
         <tr>
-            <td colspan="2"> <span style="color:red; font-size:20px">Pages: </span>
-                <div id="Pages"> </div>
+            <td colspan="2">
+                <div id="Pages"> Pages:</div>
             </td>
         </tr>
         <tr>
-            <td colspan="2"> <span style="color:red; font-size:20px">Atribute Table: </span>
-                <div id="attributeTable"> </div>
+            <td colspan="2">
+                <div id="attributeTable">Atribute Table: </div>
             </td>
         </tr>
     </table>
@@ -239,15 +239,28 @@
             }
         }
 
+        let buttonPages = [];
+        function restPages() {
+        buttonPages.forEach(b=> {
+            b.style.color = "black";
+        })
+        }
+
         //to paging all recordes
-        function populatePages(featureCount) {
+        function populatePages(layerId, featureCount) {
             let pageCount = Math.ceil(featureCount / DefaultPageSize);
             let pagesDiv = document.getElementById("Pages");
-            pagesDiv.innerHTML= "";
-            
+            pagesDiv.innerHTML = "";
+
             for (let i = 0; i < pageCount; i++) {
                 let page = document.createElement("button");
-                page.textContent = i +1;
+                page.textContent = i + 1;
+                buttonPages.push(page);
+                page.addEventListener("click", function (e) {
+                    restPages();
+                    e.target.style.color = "red";
+                    populateAtributeTable(layerId, i + 1, featureCount);
+                })
                 pagesDiv.appendChild(page);
             }
             // alert("page count : " + pageCount);
@@ -258,13 +271,13 @@
             let featureCount = 0;
             getCount(layerId, c => {
                 featureCount = c;
-                populatePages(featureCount);
-                populateAtributeTable(layerId, featureCount)
+                populatePages(layerId, featureCount);
+                populateAtributeTable(layerId, 1, featureCount)
             })
         }
 
         //populate the attribute of a given layer
-        function populateAtributeTable(layerId, featureCount) {
+        function populateAtributeTable(layerId, page, featureCount) {
             //alert("Calling attribute table "+ e.target.layerId);
 
             //  alert(featureCount);
@@ -280,6 +293,7 @@
                     where: "1=1",
                     returnCountOnly: false,
                     outFields: "*",
+                    resultOffset: (page - 1) * DefaultPageSize + 1,
                     resultRecordCount: DefaultPageSize
                 }
             }
