@@ -220,7 +220,22 @@
         }
 
         function drawLine(x1, y1, x2, y2) {
-           
+            let l = {
+                type: "polyline",
+                paths: [
+                    [x1, y1],
+                    [x2, y2]
+                ]
+            }
+            let s = {
+                type: "simple-line",
+                cap: "round",
+                color: [255,0,0, 0.5],
+                width: 4,
+                style: "solid"   //short-dot
+            }
+            let graphic = new Graphic({ geometry: l, symbol: s })
+            mapview.graphics.add(graphic);
         }
 
         function drawPolygon(x1, y1, x2, y2, x3, y3) {

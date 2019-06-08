@@ -53,3 +53,29 @@ $ npm run start
 -- and goto your browser and goto this link To show your file
 (http://desktop-clnnuq7:8080/index.html OR
 http://localhost:8080/index.html)
+
+
+------------ Geometry drawing
+-- point
+
+$ let y =mapview.center.latitude;
+undefined
+$ let x = mapview.center.longitude;
+undefined
+$ drawPoint(x,y+0.001);
+
+---line
+
+$ let y =mapview.center.latitude;
+undefined
+$ let x = mapview.center.longitude;
+undefined
+$ drawLine(x+0.0001,y,x,y)
+undefined
+$ drawLine(x+0.001,y,x,y)
+undefined
+$ drawLine(x-0.001,y,x,y-0.001)
+undefined
+-------------------------To Remove all graphics use this method
+$ mapview.graphics.removeAll();   OR for remove one
+$ map.graphics.remove(your_graphic);
