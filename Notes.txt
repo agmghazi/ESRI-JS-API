@@ -1,0 +1,54 @@
+::Some notes to make your code easy::
+
+
+<< Code in Console window in  google chrome >>
+
+    if you need to check how many layer in ever layer and another important sample code
+layer.sublayers.length
+2
+layer.sublayers.items[0].sublayers.lenght
+1
+map.layers.items[0].sublayers._items[0].title
+"Damage to Residential Buildings"
+map.layers.items[0].sublayers.length
+1
+map.layers.items[0].findSublayerById(0).title
+"No Permit"
+map.layers.items[0].findSublayerById(0).visible=false
+false
+map.layers.items[0].findSublayerById(0).visible=true
+true
+
+
+layer.sublayers.items.length
+1
+layer.sublayers.items[0].sublayers._items.length
+3
+layer.sublayers.items[0].sublayers._items[0].sublayers._items.length
+2
+layer.sublayers.items[0].sublayers._items[0].id
+7
+
+---To install npm in your files project (write in terminl this code)
+$ npm init
+$ npm install express
+------ and make this...
+
+1- write this code in Index.js
+const express = require('express');
+const app = express();
+
+app.use(express.static(__dirname + '/' ));
+
+app.listen(8080, ()=> {
+    console.log('we are live in port 8080');
+    
+})
+
+----------- and goto package.json and write this code
+
+    "start": "node index.js"
+------ then goto your terminal and add this code
+$ npm run start
+-- and goto your browser and goto this link To show your file
+(http://desktop-clnnuq7:8080/index.html)
