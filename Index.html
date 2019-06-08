@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="https://js.arcgis.com/4.4"></script>
-    <link rel="styleSheet" href="https://js.arcgis.com/4.4/esri/css/main.css">
+    <script src="https://js.arcgis.com/4.9/init.js"></script>
+    <link rel="styleSheet" href="https://js.arcgis.com/4.9/esri/css/main.css">
     <title>esri api tutorial</title>
 </head>
 
@@ -44,6 +44,7 @@
         let map;
         let layer;
         let Request;
+        let Graphic;
         let selectdService;
         const DefaultBaseMap = "streets";
         const DefaultService = "Water_Network";
@@ -54,25 +55,27 @@
             'esri/request',
             'esri/layers/MapImageLayer',
             'esri/widgets/Legend',
-            'esri/widgets/Search'],
+            'esri/widgets/Search',
+            "esri/Graphic"],
             function (Map,
                 MapView,
                 EsriRequest,
                 MapLayer,
                 Legend,
-                Search) {
+                Search,
+                GraphicClass) {
 
                 Request = EsriRequest;
+                Graphic = GraphicClass;
 
                 generateBaseMaps();
 
-                map = new Map({ basemap: DefaultBaseMap });
+                map = new Map({ basemap: DefaultBaseMap })
 
-                var viewOptions = {
-                    container: "mapView", map: map, zoom: 15,
-                    center: [-88.15305218650816, 41.77040974261415]
-
-                };
+                let viewOptions = {
+                    container: "mapView", map: map,
+                    center: [-117.1616394868625, 32.7127455035969], scale: 10000
+                }
 
                 mapview = new MapView(viewOptions);
 
@@ -126,7 +129,7 @@
 
                 }
 
-            })
+            });
 
         function buildToc() {
             //this code to generate table of content (visible & not visible)
@@ -199,6 +202,31 @@
             }
         }
 
+        // geometry drawing
+        function drawPoint(x, y) {
+            let p = {
+                type: "point",
+                longitude: x,
+                latitude: y
+            }
+            let s = {
+                type: "simple-marker",
+                color: [255, 0, 0, 0.5],
+                size: 30
+            }
+
+            let graphic = new Graphic({ geometry: p, symbol: s })
+            mapview.graphics.add(graphic);
+        }
+
+        function drawLine(x1, y1, x2, y2) {
+           
+        }
+
+        function drawPolygon(x1, y1, x2, y2, x3, y3) {
+
+        }
+
         //generate alots of button of basemaps
         function generateBaseMaps() {
             let basemaps = [];
@@ -241,9 +269,9 @@
 
         let buttonPages = [];
         function restPages() {
-        buttonPages.forEach(b=> {
-            b.style.color = "black";
-        })
+            buttonPages.forEach(b => {
+                b.style.color = "black";
+            })
         }
 
         //to paging all recordes
@@ -348,4 +376,3 @@
 </body>
 
 </html>
-

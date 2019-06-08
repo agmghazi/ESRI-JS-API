@@ -51,4 +51,5 @@ app.listen(8080, ()=> {
 ------ then goto your terminal and add this code
 $ npm run start
 -- and goto your browser and goto this link To show your file
-(http://desktop-clnnuq7:8080/index.html)
+(http://desktop-clnnuq7:8080/index.html OR
+http://localhost:8080/index.html)
