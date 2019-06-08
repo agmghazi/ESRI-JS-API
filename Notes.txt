@@ -76,6 +76,10 @@ $ drawLine(x+0.001,y,x,y)
 undefined
 $ drawLine(x-0.001,y,x,y-0.001)
 undefined
+---------------------
+-------Draw polygon 
+$ drawPolygon(x,y,x+0.002,y-0.001,x-0.03,y-0.003)
+
 -------------------------To Remove all graphics use this method
 $ mapview.graphics.removeAll();   OR for remove one
 $ map.graphics.remove(your_graphic);
