@@ -11,7 +11,7 @@ class AttributeTable {
                 this.populatePages(c);
                 this.populateAtributeTable(1, c)
             })
-            .catch(err => alert("error! " + err));
+            .catch(err => ("error! " + err));
     }
 
 

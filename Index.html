@@ -13,6 +13,9 @@
 </head>
 
 <body>
+    <span style="color:red; font-size:20px"> ArcgGIS Server Url:</span> <input id="txtArcGISserverUrl"
+        style="width: 500px" value="https://sampleserver6.arcgisonline.com/arcgis/rest/services"> <button
+        id="btnLoadService">Load Services</button> <br>
     <span style="color:red; font-size:20px"> Services:</span> <select id="lstServices"></select>
     <span style="color:red; font-size:20px"> Basemap:</span> <select id="buttons"></select>
     <table border="1">
@@ -49,7 +52,7 @@
         let Graphic;
         let selectdService;
         const DefaultBaseMap = "streets";
-        const DefaultService = "Water_Network";
+        const DefaultService = "USA"; //"Water_Network";
         const DefaultPageSize = "100";
 
         require(['esri/Map',
@@ -97,7 +100,11 @@
                 function populateMapServices() {
 
                     //this to get all services in arcserver API
-                    let Url = 'https://sampleserver6.arcgisonline.com/arcgis/rest/services?f=pjson';
+                    //let Url = 'https://sampleserver6.arcgisonline.com/arcgis/rest/services?f=pjson';
+
+                    let url = document.getElementById("txtArcGISserverUrl").value;
+                    Url = url + "?f=pjson";
+
                     let options = { responseType: "json" };
                     Request(Url, options).then(response => {
                         let result = response.data;
@@ -107,16 +114,20 @@
                         lstServices.addEventListener("change", onChangeServiceMap);
                         // this to add all services from url to selectbox
                         for (var i = 0; i < result.services.length; i++) {
-                            let option = document.createElement("option");
-                            option.textContent = result.services[i].name;
-                            if (DefaultService == result.services[i].name) option.selected = true;
-                            lstServices.appendChild(option);
-                            // alert(result.services[i].name)
+
+                            if (result.services[i].type === "MapServer") {
+
+                                let option = document.createElement("option");
+                                option.textContent = result.services[i].name;
+                                if (DefaultService == result.services[i].name) option.selected = true;
+                                lstServices.appendChild(option);
+                                // alert(result.services[i].name)
+                           }
                         }
                         onChangeServiceMap();
                     });
                 }
-                
+
                 //on change service Map
                 function onChangeServiceMap() {
 
@@ -124,14 +135,19 @@
                         .options[lstServices.selectedIndex].textContent;
 
                     //add a layer
-                    layer = new MapLayer({ url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/" + selectdService + "/MapServer" });
+                    let url = document.getElementById("txtArcGISserverUrl").value;
+                    layer = new MapLayer({ url: url + "/" + selectdService + "/MapServer" });
                     map.removeAll();
                     map.add(layer);
                     //wait until the layer is loaded
                     layer.then(buildToc)
-
                 }
 
+                //setup events for btton load services
+                let btnload = document.getElementById("btnLoadService");
+                btnload.addEventListener("click", function () {
+                    populateMapServices();
+                })
             });
 
         function buildToc() {
@@ -244,6 +260,8 @@
                 cmbBasemaps.appendChild(option);
             }
         }
+
+
     </script>
 </body>
 
