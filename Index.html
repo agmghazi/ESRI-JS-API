@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="https://js.arcgis.com/4.9/init.js"></script>
-    <link rel="styleSheet" href="https://js.arcgis.com/4.9/esri/css/main.css">
+    <script src="https://js.arcgis.com/4.5/init.js"></script>
+    <link rel="styleSheet" href="https://js.arcgis.com/4.5/esri/css/main.css">
+    <script src="toc.js"></script>
+    <script src="attributeTable.js"></script>
     <title>esri api tutorial</title>
 </head>
 
@@ -114,6 +116,7 @@
                         onChangeServiceMap();
                     });
                 }
+                
                 //on change service Map
                 function onChangeServiceMap() {
 
@@ -132,75 +135,12 @@
             });
 
         function buildToc() {
-            //this code to generate table of content (visible & not visible)
-            let toc = document.getElementById("toc");
-            toc.innerHTML = "";
-
-            let layerList = document.createElement("ul");
-            toc.appendChild(layerList);
-
-            //populate layer in list
-            populateLayerRecursive(layer, layerList);
+            let toc = new Toc(layer, "toc");
 
             mapview.goTo(layer.fullExtent)
 
         }
-        //this for query data
-        function getCount(layerId, featureCount) {
-            let queryUrl = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/"
-                + selectdService + "/MapServer/" + layerId + "/query";
-            let queryOption = {
-                responseType: "json",
-                query: {
-                    f: "json",
-                    where: "1=1",
-                    returnCountOnly: true
-                }
-            }
 
-            Request(queryUrl, queryOption).then(
-                response => featureCount(response.data.count),
-                response => featureCount(0));
-        }
-
-        // populate layer Recursive in the input element
-        function populateLayerRecursive(thislayer, layerList) {
-
-            let chk = document.createElement("input");
-            chk.type = "checkbox";
-            chk.value = thislayer.id;
-            chk.checked = thislayer.visible;
-
-            chk.addEventListener("click", e => { thislayer.visible = e.target.checked })
-
-            let lbl = document.createElement("label");
-            lbl.textContent = thislayer.title + "   ";
-
-            let btn = document.createElement("button");
-            btn.textContent = "view";
-
-            //this method to get count for every layer
-            //getCount(thislayer.id, btn);
-            //on click, open attribut table
-            btn.layerId = thislayer.id;
-            btn.addEventListener("click", openAttributeTable);
-
-            let layerItem = document.createElement("li");
-            layerItem.appendChild(chk);
-            layerItem.appendChild(lbl);
-            layerList.appendChild(layerItem);
-            layerItem.appendChild(btn);
-            if (thislayer.sublayers != null && thislayer.sublayers.items.length > 0) {
-
-                let newList = document.createElement("ul");
-                layerList.appendChild(newList);
-
-                for (let i = 0; i < thislayer.sublayers.length; i++) {
-
-                    populateLayerRecursive(thislayer.sublayers.items[i], newList)
-                }
-            }
-        }
 
         // geometry drawing
         function drawPoint(x, y) {
@@ -230,7 +170,7 @@
             let s = {
                 type: "simple-line",
                 cap: "round",
-                color: [255,0,0, 0.5],
+                color: [255, 0, 0, 0.5],
                 width: 4,
                 style: "solid"   //short-dot
             }
@@ -244,22 +184,22 @@
                 rings: [
                     [x1, y1],
                     [x2, y2],
-                    [x3,y3],
-                    [x1,y1]
+                    [x3, y3],
+                    [x1, y1]
                 ]
             }
             let s = {
                 type: "simple-fill",
-                color: [255,0,0, 0.5],
+                color: [255, 0, 0, 0.5],
                 style: "cross",
                 outline: {
-                    width:5,
-                    color: [0.0,0,255,0.5],
+                    width: 5,
+                    color: [0.0, 0, 255, 0.5],
                     style: "short-dot"
-                    
+
 
                 }
-               
+
             }
             let graphic = new Graphic({ geometry: p, symbol: s })
             mapview.graphics.add(graphic);
@@ -303,112 +243,6 @@
 
                 cmbBasemaps.appendChild(option);
             }
-        }
-
-        let buttonPages = [];
-        function restPages() {
-            buttonPages.forEach(b => {
-                b.style.color = "black";
-            })
-        }
-
-        //to paging all recordes
-        function populatePages(layerId, featureCount) {
-            let pageCount = Math.ceil(featureCount / DefaultPageSize);
-            let pagesDiv = document.getElementById("Pages");
-            pagesDiv.innerHTML = "";
-
-            for (let i = 0; i < pageCount; i++) {
-                let page = document.createElement("button");
-                page.textContent = i + 1;
-                buttonPages.push(page);
-                page.addEventListener("click", function (e) {
-                    restPages();
-                    e.target.style.color = "red";
-                    populateAtributeTable(layerId, i + 1, featureCount);
-                })
-                pagesDiv.appendChild(page);
-            }
-            // alert("page count : " + pageCount);
-        }
-
-        function openAttributeTable(e) {
-            let layerId = e.target.layerId;
-            let featureCount = 0;
-            getCount(layerId, c => {
-                featureCount = c;
-                populatePages(layerId, featureCount);
-                populateAtributeTable(layerId, 1, featureCount)
-            })
-        }
-
-        //populate the attribute of a given layer
-        function populateAtributeTable(layerId, page, featureCount) {
-            //alert("Calling attribute table "+ e.target.layerId);
-
-            //  alert(featureCount);
-
-            let attributeTable = document.getElementById("attributeTable");
-            attributeTable.innerHTML = "";
-            let queryUrl = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/"
-                + selectdService + "/MapServer/" + layerId + "/query";
-            let queryOption = {
-                responseType: "json",
-                query: {
-                    f: "json",
-                    where: "1=1",
-                    returnCountOnly: false,
-                    outFields: "*",
-                    resultOffset: (page - 1) * DefaultPageSize + 1,
-                    resultRecordCount: DefaultPageSize
-                }
-            }
-
-            Request(queryUrl, queryOption).then(response => {
-
-                //alert(response.data.fields.length);
-                let table = document.createElement("table");
-                table.border = 2;
-                let header = document.createElement("tr");
-                table.appendChild(header);
-                //populate the fileds / columns
-                for (let i = 0; i < response.data.fields.length; i++) {
-
-                    let column = document.createElement("th");
-                    column.textContent = response.data.fields[i].alias;
-                    header.appendChild(column);
-                }
-
-                //loop through all features
-                for (let j = 0; j < response.data.features.length; j++) {
-                    let feature = response.data.features[j];
-                    let row = document.createElement("tr");
-                    table.appendChild(row);
-                    for (let i = 0; i < response.data.fields.length; i++) {
-
-                        let field = response.data.fields[i];
-
-                        let column = document.createElement("td");
-
-                        // this to convert datetime from EPOCH(this to use samply to use by any thing in programming
-                        //  (samply to convert to mile second)) to Date
-                        if (field.type == "esriFieldTypeDate") {
-
-                            let date = new Date(feature.attributes[field.name]);
-                            column.textContent = date.toLocaleDateString('en-US');;
-                        }
-                        else {
-                            column.textContent = feature.attributes[field.name];
-
-                        }
-                        row.appendChild(column);
-                    }
-                }
-
-
-                attributeTable.appendChild(table);
-
-            }, response => el.style.visibility = "hidden");
         }
     </script>
 </body>
