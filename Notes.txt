@@ -83,3 +83,65 @@ $ drawPolygon(x,y,x+0.002,y-0.001,x-0.03,y-0.003)
 -------------------------To Remove all graphics use this method
 $ mapview.graphics.removeAll();   OR for remove one
 $ map.graphics.remove(your_graphic);
+
+--------------------------------------------
+-- Now When goto some layer (some layer have diffrant cordinate)
+now goto layer (like Water_Network) and found diffrant spatial refrance of another layer
+-- ("spatialReference": {
+"wkt": "PROJCS[\"NAD_1983_HARN_StatePlane_Illinois_East_FIPS_1201\",GEOGCS[\"GCS_North_American_1983_HARN\",DATUM[\"D_North_American_1983_HARN\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",984250.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",-88.33333333333333],PARAMETER[\"Scale_Factor\",0.999975],PARAMETER[\"Latitude_Of_Origin\",36.66666666666666],UNIT[\"Foot_US\",0.3048006096012192]]"
+},)
+
+Now need to convert this spatial refarance to another spatial refrance like (USA)layer
+--( "spatialReference": {
+  "wkid": 4326,
+  "latestWkid": 4326
+ },)
+ ---
+ Now goto this link https://sampleserver6.arcgisonline.com/arcgis/rest/services/Utilities/Geometry/GeometryServer/project
+ (this is like ArcTool but work in ArcServer) 
+ and add this data to here
+
+ 
+Input Spatial Reference:	
+{"wkt": "PROJCS[\"NAD_1983_HARN_StatePlane_Illinois_East_FIPS_1201\",GEOGCS[\"GCS_North_American_1983_HARN\",DATUM[\"D_North_American_1983_HARN\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",984250.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",-88.33333333333333],PARAMETER[\"Scale_Factor\",0.999975],PARAMETER[\"Latitude_Of_Origin\",36.66666666666666],UNIT[\"Foot_US\",0.3048006096012192]]"}
+Output Spatial Reference:	
+4326
+Geometries:	    // this code from this link (http://resources.esri.com/help/9.3/arcgisserver/apis/rest/project.html)
+{
+"geometryType" : "esriGeometryPoint",
+"geometries" : [        
+ {"x" :1023791.2043204177,"y":1852418.2998271778},   // get this cordinate from water_Layer ("fullExtent": {
+"xmin": 1023791.2043204177,
+"ymin": 1852418.2998271778,
+"xmax": 1043929.8445876744,
+"ymax": 1872694.875986676,) 
+ {"x" :1043929.8445876744, "y" :1872694.875986676}
+]
+}
+--------- and MAKE (Project (POST))  will found this 
+{"geometries": [
+ {
+  "x": -88.18842141221451,
+  "y": 41.752453399999304
+ },
+ {
+  "x": -88.11442792210694,
+  "y": 41.80798149503926
+ }
+]}
+
+------ to discover what is happen Select Water_Layer and Write this code in console
+(mapview.extent = map.layers.items[0].fullExtent)
+*** WILL Get Some Error. To Fix This Use this in console ??
+let fe={}
+undefined
+fe.xmin= -88.18842141221451;
+-88.18842141221451
+fe.ymin= 41.752453399999304;
+41.752453399999304
+fe.xmax=  -88.11442792210694;
+-88.11442792210694
+fe.ymax=  41.80798149503926
+41.80798149503926
+mapview.extent=fe
+--------------------------------------------------
