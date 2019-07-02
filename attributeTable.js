@@ -44,16 +44,23 @@ class AttributeTable {
 
 
     //to paging all recordes
-    populatePages(featureCount) {
+    populatePages(featureCount , initPage = 1) {
         let pageCount = Math.ceil(featureCount / DefaultPageSize);
         let pagesDiv = document.getElementById("Pages");
-        pagesDiv.innerHTML = "";
+        // pagesDiv.innerHTML = "";
+        while (pagesDiv.firstChild)    // this to remove data after change layer
+            pagesDiv.removeChild(pagesDiv.firstChild);
+            
         let AttributeTableinstance = this;
-
         for (let i = 0; i < pageCount; i++) {
             let page = document.createElement("button");
             page.textContent = i + 1;
             this.buttonPages.push(page);
+            page.attributeTable = this;
+            page.pageNumber = i+1;
+            // heighlight the first page.
+            if(i+1 ===initPage) page.style.color= "red";
+            page.featureCount = featureCount;
             page.addEventListener("click", function (e) {
                 AttributeTableinstance.restPages();
                 e.target.style.color = "red";
