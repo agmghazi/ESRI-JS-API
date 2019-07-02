@@ -64,7 +64,32 @@ class AttributeTable {
         // alert("page count : " + pageCount);
     }
 
+    zoom(e) {
+        let oid = e.target.oid;
+        let url = e.target.url;
+        // alert(oid + "-" + url)
 
+        let queryUrl = url + "query";
+
+        let queryOption = {
+            responseType: "json",
+            query: {
+                f: "json",
+                objectIds: oid,
+                returnGeometry: true,
+                outSR: 4326
+            }
+        }
+
+        Request(queryUrl, queryOption)
+            .then(response => {
+                // when we get the geometry back, create graphic and zoom...
+                //  alert("Sucess"+ JSON.stringify(response))
+                //   alert(JSON.stringify(response.data));
+                drawGeometry(response.data.features[0].geometry);
+            })
+            .catch(err => reject(alert("ERRor" + Rerr)));
+    }
 
     //populate the attribute of a given layer
     populateAtributeTable(page, featureCount) {
@@ -85,6 +110,7 @@ class AttributeTable {
             }
         }
 
+
         Request(queryUrl, queryOption).then(response => {
 
             //alert(response.data.fields.length);
@@ -92,7 +118,13 @@ class AttributeTable {
             table.border = 2;
             let header = document.createElement("tr");
             table.appendChild(header);
-            //populate the fileds / columns
+
+            //populate zoom column
+            let zoomHeader = document.createElement("th");
+            zoomHeader.textContent = "zoom";
+            header.appendChild(zoomHeader);
+
+            //populate the fileds / columns            
             for (let i = 0; i < response.data.fields.length; i++) {
 
                 let column = document.createElement("th");
@@ -104,6 +136,17 @@ class AttributeTable {
             for (let j = 0; j < response.data.features.length; j++) {
                 let feature = response.data.features[j];
                 let row = document.createElement("tr");
+                let zoomColumn = document.createElement("td");
+                let img = document.createElement("img");
+                img.style.width = "32px";
+                img.style.height = "32px";
+                img.src = "zoom.png";
+                img.url = this.mapserviceLayerUrl;
+                img.addEventListener("click", this.zoom);
+                zoomColumn.appendChild(img);
+                row.appendChild(zoomColumn);
+
+
                 table.appendChild(row);
                 for (let i = 0; i < response.data.fields.length; i++) {
 
@@ -113,7 +156,10 @@ class AttributeTable {
 
                     // this to convert datetime from EPOCH(this to use samply to use by any thing in programming
                     //  (samply to convert to mile second)) to Date
-                    if (field.type == "esriFieldTypeDate") {
+                    if (field.type === "esriFieldTypeOID") {
+                        img.oid = feature.attributes[field.name];
+                    }
+                    if (field.type === "esriFieldTypeDate") {
 
                         let date = new Date(feature.attributes[field.name]);
                         column.textContent = date.toLocaleDateString('en-US');;

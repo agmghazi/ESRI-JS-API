@@ -190,6 +190,62 @@
         }
 
 
+        function drawGeometry(geometry,cleanup = true) {
+            let g;
+            let s;
+            //it is line 
+            if (geometry.paths != undefined) {
+                g = {
+                    type: "polyline",
+                    paths: geometry.paths
+                }
+                s = {
+                    type: "simple-line",
+                    cap: "round",
+                    color: [255, 0, 0, 0.5],
+                    width: 7,
+                    style: "solid"   //short-dot
+                }
+
+            } // it is a polygon
+            else if (geometry.rings != undefined) {
+                g = {
+                    type: "polygon",
+                    rings: geometry.rings
+                }
+                s = {
+                    type: "simple-fill",
+                    color: [255, 0, 0, 0.5],
+                    style: "backward-diagonal",
+                    outline: {
+                        width: 5,
+                        color: [0, 0, 255, 0.7],
+                        style: "solid"
+
+                    }
+
+                }
+            }// it is a point
+            else {
+                g = {
+                    type: "point",
+                    longitude: geometry.x,
+                    latitude: geometry.y
+                }
+                s = {
+                    type: "simple-marker",
+                    color: [255, 0, 0, 0.5],
+                    size: 30
+                }
+
+            }
+            
+            if (cleanup  === true) mapview.graphics = [];
+            let graphic = new Graphic({ geometry: g, symbol: s })
+            mapview.graphics.add(graphic);
+            mapview.goTo(graphic);
+        }
+
         // geometry drawing
         function drawPoint(x, y) {
             let p = {
@@ -295,6 +351,7 @@
 
 
     </script>
+    
 </body>
 
 </html>
