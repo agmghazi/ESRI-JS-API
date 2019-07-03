@@ -18,6 +18,7 @@
         id="btnLoadService">Load Services</button> <br>
     <span style="color:red; font-size:20px"> Services:</span> <select id="lstServices"></select>
     <span style="color:red; font-size:20px"> Basemap:</span> <select id="buttons"></select>
+    Use Current Extent: <input type="checkbox" checked id="chkExtent">
     <table border="1">
         <tr>
             <td valign=top>
@@ -54,6 +55,7 @@
         const DefaultBaseMap = "streets";
         const DefaultService = "USA"; //"Water_Network";
         const DefaultPageSize = "100";
+        const DEAFULT_USE_EXTENT= true;
 
         require(['esri/Map',
             'esri/views/MapView',
@@ -84,6 +86,9 @@
 
                 mapview = new MapView(viewOptions);
 
+                // this for checked on open app (query full extent)
+                mapview.useExtent =DEAFULT_USE_EXTENT;
+
                 // this only to add legend widget
                 let legend = new Legend({ view: mapview });
                 mapview.ui.add(legend, "bottom-left");
@@ -112,6 +117,12 @@
 
                         //set event listener onChange
                         lstServices.addEventListener("change", onChangeServiceMap);
+
+                        // set event listener on change map extent
+                        const chkExtent = document.getElementById("chkExtent");
+                        chkExtent.checked =DEAFULT_USE_EXTENT;
+                        chkExtent.addEventListener("change", e => onChangeExtentStatus());
+
                         // this to add all services from url to selectbox
                         for (var i = 0; i < result.services.length; i++) {
 
@@ -128,6 +139,11 @@
                     });
                 }
 
+                function onChangeExtentStatus() {
+                    if (mapview != undefined) {
+                        mapview.useExtent = document.getElementById("chkExtent").checked;
+                    }
+                }
                 //on change service Map
                 function onChangeServiceMap() {
 
@@ -183,14 +199,14 @@
         }
 
         function buildToc() {
-            let toc = new Toc(layer, "toc");
+            let toc = new Toc(layer, "toc", mapview);
             ProjectandZoom(layer.fullExtent)
             //mapview.goTo(layer.fullExtent)
 
         }
 
 
-        function drawGeometry(geometry,cleanup = true) {
+        function drawGeometry(geometry, cleanup = true) {
             let g;
             let s;
             //it is line 
@@ -239,8 +255,8 @@
                 }
 
             }
-            
-            if (cleanup  === true) mapview.graphics = [];
+
+            if (cleanup === true) mapview.graphics = [];
             let graphic = new Graphic({ geometry: g, symbol: s })
             mapview.graphics.add(graphic);
             mapview.goTo(graphic);
@@ -351,7 +367,7 @@
 
 
     </script>
-    
+
 </body>
 
 </html>

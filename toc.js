@@ -1,7 +1,7 @@
 class Toc {
     
-    constructor(mapServiceLayer,tocElementString){
-        
+    constructor(mapServiceLayer,tocElementString, mapview){
+        this.mapview = mapview;
         this.tocElement = document.getElementById(tocElementString);
 
         //this code to generate table of content (visible & not visible)
@@ -34,6 +34,7 @@ class Toc {
         //on click, open attribut table
         btn.layerId = thislayer.id;
         btn.layerUrl =thislayer.url;
+        btn.mapview = this.mapview;
         btn.addEventListener("click", this.openAttributeTable);
 
         let layerItem = document.createElement("li");
@@ -55,7 +56,7 @@ class Toc {
     
     openAttributeTable(e) {
         
-        let attributeTable = new AttributeTable(e.target.layerUrl);
+        let attributeTable = new AttributeTable(e.target.layerUrl,e.target.mapview);
 
     }
 }

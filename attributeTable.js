@@ -1,9 +1,10 @@
 class AttributeTable {
 
     //"https://sampleserver6.arcgisonline.com/arcgis/rest/services/" + selectdService + "/MapServer/";
-    constructor(mapserviceLayerUrl) {
+    constructor(mapserviceLayerUrl, mapview) {
         this.buttonPages = [];
 
+        this.mapview = mapview;
         this.mapserviceLayerUrl = mapserviceLayerUrl + "/";
 
         this.getCount()
@@ -23,15 +24,24 @@ class AttributeTable {
 
 
     getCount() {
+        const AttributeTableInstance = this;
         return new Promise((resolve, reject) => {
 
             let queryUrl = this.mapserviceLayerUrl + "query";
+
+            // for show and check checkbox is true or not. 
+            let extent = undefined;
+            if (this.mapview.useExtent) extent = JSON.stringify(this.mapview.extent);
 
             let queryOption = {
                 responseType: "json",
                 query: {
                     f: "json",
                     where: "1=1",
+                    geometry: extent,
+                    inSR: JSON.stringify(AttributeTableInstance.mapview.extent.spatialReference),
+                    geometryType: "esriGeometryEnvelope",
+                    spatialRel: "esriSpatialRelIntersects",
                     returnCountOnly: true
                 }
             }
@@ -44,22 +54,22 @@ class AttributeTable {
 
 
     //to paging all recordes
-    populatePages(featureCount , initPage = 1) {
+    populatePages(featureCount, initPage = 1) {
         let pageCount = Math.ceil(featureCount / DefaultPageSize);
         let pagesDiv = document.getElementById("Pages");
         // pagesDiv.innerHTML = "";
         while (pagesDiv.firstChild)    // this to remove data after change layer
             pagesDiv.removeChild(pagesDiv.firstChild);
-            
+
         let AttributeTableinstance = this;
         for (let i = 0; i < pageCount; i++) {
             let page = document.createElement("button");
             page.textContent = i + 1;
             this.buttonPages.push(page);
             page.attributeTable = this;
-            page.pageNumber = i+1;
+            page.pageNumber = i + 1;
             // heighlight the first page.
-            if(i+1 ===initPage) page.style.color= "red";
+            if (i + 1 === initPage) page.style.color = "red";
             page.featureCount = featureCount;
             page.addEventListener("click", function (e) {
                 AttributeTableinstance.restPages();
@@ -102,7 +112,11 @@ class AttributeTable {
     populateAtributeTable(page, featureCount) {
 
         let queryUrl = this.mapserviceLayerUrl + "query";
-
+        
+        // for show and check checkbox is true or not. 
+        let extent = undefined;
+        if (this.mapview.useExtent) extent = JSON.stringify(this.mapview.extent);
+        
         let attributeTable = document.getElementById("attributeTable");
         attributeTable.innerHTML = "";
         let queryOption = {
@@ -110,9 +124,13 @@ class AttributeTable {
             query: {
                 f: "json",
                 where: "1=1",
+                geometry: extent,
+                inSR: JSON.stringify(this.mapview.extent.spatialReference),
+                geometryType: "esriGeometryEnvelope",
+                spatialRel: "esriSpatialRelEnvelopeIntersects",
                 returnCountOnly: false,
                 outFields: "*",
-                resultOffset: (page - 1) * DefaultPageSize + 1,
+                resultOffset: (page - 1) * DefaultPageSize,
                 resultRecordCount: DefaultPageSize
             }
         }

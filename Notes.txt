@@ -145,3 +145,6 @@ fe.ymax=  41.80798149503926
 41.80798149503926
 mapview.extent=fe
 --------------------------------------------------
+--- to get data from current view extent and to get set this write this code to google chrome
+ JSON.stringify(mapview.extent)
+   "{"xmin":-9815080.493791888,"ymin":5130144.828927306,"xmax":-9815061.832408035,"ymax":5130154.159619233,"spatialReference":{"latestWkid":3857,"wkid":102100}}"
