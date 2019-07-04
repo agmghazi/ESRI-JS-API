@@ -10,7 +10,7 @@ class AttributeTable {
         this.getCount()
             .then(c => {
                 this.populatePages(c);
-                this.populateAtributeTable(1, c)
+               // this.populateAtributeTable(1, c)
             })
             .catch(err => ("error! " + err));
     }
@@ -54,7 +54,7 @@ class AttributeTable {
 
 
     //to paging all recordes
-    populatePages(featureCount, initPage = 1) {
+    populatePages(featureCount, initPage = 1, initSet = 0) {
         let pageCount = Math.ceil(featureCount / DefaultPageSize);
         let pagesDiv = document.getElementById("Pages");
         // pagesDiv.innerHTML = "";
@@ -62,22 +62,41 @@ class AttributeTable {
             pagesDiv.removeChild(pagesDiv.firstChild);
 
         let AttributeTableinstance = this;
-        for (let i = 0; i < pageCount; i++) {
+        
+        //this to display next button after finish data
+        let pageToDraw = DEFAULT_SET_PAGE_SIZE;
+        if (pageCount - initSet < DEFAULT_SET_PAGE_SIZE) {
+            pageToDraw = pageCount -initSet;
+        }
+        
+        for (let i = initSet; i < initSet + pageToDraw; i++) {
             let page = document.createElement("button");
             page.textContent = i + 1;
             this.buttonPages.push(page);
             page.attributeTable = this;
             page.pageNumber = i + 1;
-            // heighlight the first page.
-            if (i + 1 === initPage) page.style.color = "red";
             page.featureCount = featureCount;
+            
             page.addEventListener("click", function (e) {
                 AttributeTableinstance.restPages();
-                e.target.style.color = "red";
+                e.target.style.color ="red";
                 AttributeTableinstance.populateAtributeTable(i + 1, featureCount);
-            })
+            });
+            
+            // heighlight the first page.
+            if (i+1 === initPage) {page.style.color = "red"; page.click()};
+
             pagesDiv.appendChild(page);
         }
+        // this for make next more pages
+        let nextSet = document.createElement("button");
+        nextSet.textContent = "Next";
+        nextSet.disabled = pageCount - initSet < DEFAULT_SET_PAGE_SIZE;
+        nextSet.addEventListener("click", function (e) {
+            AttributeTableinstance.restPages();
+            AttributeTableinstance.populatePages(featureCount, initSet + DEFAULT_SET_PAGE_SIZE +1 , initSet + DEFAULT_SET_PAGE_SIZE);
+        })
+        pagesDiv.appendChild(nextSet);
         // alert("page count : " + pageCount);
     }
 
@@ -112,11 +131,11 @@ class AttributeTable {
     populateAtributeTable(page, featureCount) {
 
         let queryUrl = this.mapserviceLayerUrl + "query";
-        
+
         // for show and check checkbox is true or not. 
         let extent = undefined;
         if (this.mapview.useExtent) extent = JSON.stringify(this.mapview.extent);
-        
+
         let attributeTable = document.getElementById("attributeTable");
         attributeTable.innerHTML = "";
         let queryOption = {
