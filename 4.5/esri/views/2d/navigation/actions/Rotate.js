@@ -1,0 +1,5 @@
+// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
+// See https://js.arcgis.com/4.5/esri/copyright.txt for details.
+//>>built
+define("require exports ../../../../core/tsSupport/declareExtendsHelper ../../../../core/tsSupport/decorateHelper ../../../../core/accessorSupport/decorators ../../../../core/Accessor ../../viewpointUtils ../../libs/gl-matrix/vec2".split(" "),function(m,n,k,f,c,l,g,e){return function(h){function a(b){b=h.call(this)||this;b.animationTime=0;b.viewpoint=g.create();return b}k(a,h);a.prototype.begin=function(b,a){this.navigation.begin()};a.prototype.update=function(b,a){var d=a.pointers[0];a=e.create();
+e.set(a,d.currentEvent.x+b.padding.left,b.height-d.currentEvent.y+b.padding.top);var d=d.previousEvent,c=e.create();e.set(c,d.x+b.padding.left,b.height-d.y+b.padding.top);a=g.angleBetween(b.state.paddedScreenCenter,a,c);b.viewpoint=g.rotateBy(this.viewpoint,b.content.viewpoint,a)};a.prototype.end=function(a,c){this.navigation.end()};f([c.property()],a.prototype,"viewpoint",void 0);f([c.property()],a.prototype,"navigation",void 0);return a=f([c.subclass("esri.views.2d.actions.Rotate")],a)}(c.declared(l))});

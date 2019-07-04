@@ -1,0 +1,5 @@
+// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
+// See https://js.arcgis.com/4.5/esri/copyright.txt for details.
+//>>built
+define("require exports ../../../core/tsSupport/extendsHelper ../../../core/tsSupport/decorateHelper ../../../core/accessorSupport/decorators ./DynamicLayerView3D".split(" "),function(l,m,h,g,e,k){return function(f){function b(){return null!==f&&f.apply(this,arguments)||this}h(b,f);b.prototype.processResult=function(a,d){a.image=document.createElement("canvas");a.pixelData=d.pixelData;var c=a.image;d=c.getContext("2d");a=this.layer.applyFilter(a.pixelData).pixelBlock;c.width=a.width;c.height=a.height;
+c=d.createImageData(a.width,a.height);a=a.getAsRGBA();c.data.set(a);d.putImageData(c,0,0)};b.prototype.updateImage=function(a){if(a&&a.pixelData){var d=a.image,c=d.getContext("2d");a=this.layer.applyFilter(a.pixelData).pixelBlock;var b=c.createImageData(a.width,a.height),e=a.getAsRGBA();d.width=a.width;d.height=a.height;b.data.set(e);c.putImageData(b,0,0);return!0}return!1};g([e.property()],b.prototype,"layer",void 0);return b=g([e.subclass("esri.views.3d.layers.ImageryLayerView3D")],b)}(e.declared(k))});

@@ -1,0 +1,5 @@
+// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
+// See https://js.arcgis.com/4.5/esri/copyright.txt for details.
+//>>built
+define("require exports ../../../core/tsSupport/declareExtendsHelper ../../../core/tsSupport/decorateHelper ../../../core/accessorSupport/decorators ../../../core/Accessor ./PointDrawAction ./PolygonDrawAction ./PolylineDrawAction".split(" "),function(l,m,e,c,b,f,g,h,k){return function(d){function a(){var a=null!==d&&d.apply(this,arguments)||this;a.activeAction=null;a.view=null;return a}e(a,d);a.prototype.destroy=function(){this.activeAction&&(this.activeAction.destroy(),this.activeAction=null)};
+a.prototype.create=function(a){this.activeAction&&(this.activeAction.destroy(),this.activeAction=null);switch(a){case "point":this.activeAction=new g({view:this.view});break;case "polygon":this.activeAction=new h({view:this.view});break;case "polyline":this.activeAction=new k({view:this.view})}return this.activeAction};c([b.property()],a.prototype,"activeAction",void 0);c([b.property()],a.prototype,"view",void 0);return a=c([b.subclass("esri.views.2d.draw.Draw")],a)}(b.declared(f))});

@@ -1,0 +1,5 @@
+// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
+// See https://js.arcgis.com/4.5/esri/copyright.txt for details.
+//>>built
+define("require exports ../../../core/tsSupport/declareExtendsHelper ../../../core/tsSupport/decorateHelper ../../../core/accessorSupport/decorators ../../../Basemap ../../../core/Accessor ../../../core/Collection".split(" "),function(l,m,f,c,b,g,h,k){var e=k.ofType(g);return function(d){function a(){var a=null!==d&&d.apply(this,arguments)||this;a.basemaps=new e;a.state="ready";return a}f(a,d);a.prototype.refresh=function(){};c([b.property({type:e})],a.prototype,"basemaps",void 0);c([b.property({readOnly:!0})],
+a.prototype,"state",void 0);return a=c([b.subclass("esri.widgets.BasemapGallery.support.LocalBasemapsSource")],a)}(b.declared(h))});

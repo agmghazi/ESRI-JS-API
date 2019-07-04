@@ -1,0 +1,6 @@
+// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
+// See https://js.arcgis.com/4.5/esri/copyright.txt for details.
+//>>built
+define({advancedOptions:"Op\u00e7\u00f5es Avan\u00e7adas",travelMode:"Modo de viagem",viewActive:"Clicar no mapa adiciona uma paragem",showStop:"Exibir esta paragem",addStopTitle:"Adicionar nova paragem",addStop:"Adicionar paragem",dndHandle:"Arrastar para alterar a ordem das visitas",serviceTime:"Tempo de Servi\u00e7o",serviceDistance:"Dist\u00e2ncia de Servi\u00e7o",leaveNow:"Partir agora",departBy:"Partir em",print:"Imprimir",printDescription:"Imprimir dire\u00e7\u00f5es",gmt:"GMT",searchFieldPlaceholder:"Pesquisar ou clicar no mapa",
+viewlessSearchFieldPlaceholder:"Pesquisar",directionsPlaceholder:"A sua rota ir\u00e1 aparecer aqui",serviceError:"Parece ter ocorrido um erro",time:{min:"m\u00edn.",hr:"hr"},units:{kilometers:{name:"quil\u00f3metro(s)",abbr:"km"},meters:{name:"metro(s)",abbr:"m"},miles:{name:"milha(s)",abbr:"milhas"},feet:{name:"p\u00e9s",abbr:"ft"},yards:{name:"jarda(s)",abbr:"yd"},nauticalMiles:{name:"milha(s) n\u00e1utica(s)",abbr:"nm"}},traffic:{average:"tipicamente",none:"Sem informa\u00e7\u00f5es de tr\u00e2nsito",
+heavy:"Tr\u00e2nsito Intenso",light:"Tr\u00e2nsito Flu\u00eddo"},messages:{errors:{notEnoughStops:"Necessita de pelo menos duas paragens para resolver uma rota."}}});

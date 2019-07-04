@@ -148,3 +148,14 @@ mapview.extent=fe
 --- to get data from current view extent and to get set this write this code to google chrome
  JSON.stringify(mapview.extent)
    "{"xmin":-9815080.493791888,"ymin":5130144.828927306,"xmax":-9815061.832408035,"ymax":5130154.159619233,"spatialReference":{"latestWkid":3857,"wkid":102100}}"
+
+-------------------------------------------------------------------
+url for link /
+https://developers.arcgis.com/downloads/apis-and-sdks?product=javascript
+-- first Step //*// goto (4.5/init.js) and change this link from (https://[HOSTNAME_AND_PATH_TO_JSAPI]) TO (http://localhost:8080/4.5/)
+-- second Step //*// goto (4.5/dojo/dojo.js) and change this link from (https://[HOSTNAME_AND_PATH_TO_JSAPI]) TO (http://localhost:8080/4.5/)
+-- and then goto index.html and change link to load my local library.
+ <script src="http://localhost:8080/4.5/init.js"></script>
+ <link rel="styleSheet" href="http://localhost:8080/4.5/esri/css/main.css">
+
+-----------------------

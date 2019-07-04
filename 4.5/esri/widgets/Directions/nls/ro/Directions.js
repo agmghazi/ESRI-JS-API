@@ -1,0 +1,6 @@
+// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
+// See https://js.arcgis.com/4.5/esri/copyright.txt for details.
+//>>built
+define({advancedOptions:"Op\u0163iuni avansate",travelMode:"Mod de deplasare",viewActive:"Clicurile pe hart\u0103 adaug\u0103 un punct de oprire",showStop:"Afi\u015fare acest punct de oprire",addStopTitle:"Ad\u0103ugare punct de oprire nou",addStop:"Add stop",dndHandle:"Glisa\u0163i pentru a modifica ordinea de vizitare",serviceTime:"Timp deservire",serviceDistance:"Distan\u021b\u0103 deservire",leaveNow:"P\u0103r\u0103sire acum",departBy:"Plecare la",print:"Imprimare",printDescription:"Imprimare instruc\u0163iuni",
+gmt:"GMT",searchFieldPlaceholder:"Search or click on the map",viewlessSearchFieldPlaceholder:"C\u0103utare",directionsPlaceholder:"Your route will appear here",serviceError:"There seems to have been an error",time:{min:"Min",hr:"ore"},units:{kilometers:{name:"kilometri",abbr:"km"},meters:{name:"metri",abbr:"m"},miles:{name:"mile",abbr:"mi"},feet:{name:"ft",abbr:"ft"},yards:{name:"yarzi",abbr:"yd"},nauticalMiles:{name:"mile nautice",abbr:"nm"}},traffic:{average:"de obicei",none:"F\u0103r\u0103 informa\u0163ii de trafic",
+heavy:"Trafic aglomerat",light:"Trafic u\u015for"},messages:{errors:{notEnoughStops:"Need at least two stops to solve a route."}}});

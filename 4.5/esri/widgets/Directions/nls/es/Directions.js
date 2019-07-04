@@ -1,0 +1,6 @@
+// All material copyright ESRI, All Rights Reserved, unless otherwise specified.
+// See https://js.arcgis.com/4.5/esri/copyright.txt for details.
+//>>built
+define({advancedOptions:"Opciones avanzadas",travelMode:"Modo de viaje",viewActive:"Hacer clic en el mapa a\u00f1ade una parada",showStop:"Mostrar esta parada",addStopTitle:"A\u00f1adir nueva parada",addStop:"Agregar parada",dndHandle:"Arrastrar para cambiar el orden de visita",serviceTime:"Tiempo de servicio",serviceDistance:"Distancia de servicio",leaveNow:"Salir ahora",departBy:"Salir a las",print:"Imprimir",printDescription:"Imprimir direcciones",gmt:"GMT",searchFieldPlaceholder:"Busque o haga clic en el mapa",
+viewlessSearchFieldPlaceholder:"Buscar",directionsPlaceholder:"Su ruta aparecer\u00e1 aqu\u00ed",serviceError:"Parece que se ha producido un error",time:{min:"min",hr:"h"},units:{kilometers:{name:"kil\u00f3metro(s)",abbr:"km"},meters:{name:"metro(s)",abbr:"m"},miles:{name:"milla(s)",abbr:"mi"},feet:{name:"pies",abbr:"pies"},yards:{name:"yarda(s)",abbr:"yd"},nauticalMiles:{name:"milla(s) n\u00e1utica(s)",abbr:"mn"}},traffic:{average:"t\u00edpicamente",none:"Sin informaci\u00f3n de tr\u00e1fico",heavy:"Tr\u00e1fico pesado",
+light:"Tr\u00e1fico ligero"},messages:{errors:{notEnoughStops:"Se necesitan al menos dos paradas para resolver una ruta."}}});
